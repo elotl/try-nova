@@ -37,7 +37,7 @@ pushd "${REPO_ROOT}"/scripts
 KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-cp" NOVA_NODE_IP=$nova_node_ip ./deploy_nova.sh kind-cp ""
 
 # restore old apiserver-service.yaml
-#git checkout -- scripts/templates/apiserver-service.yaml
+git checkout -- templates/apiserver-service.yaml
 
 apiserver_endpoint_patch="server: https://$nova_node_ip:32222"
 sed -i.bak "s~server: .*~$apiserver_endpoint_patch~g" ./nova-installer-output/manifests/nova-agent-secret.yaml
