@@ -10,7 +10,7 @@ In this example, we will group nginx Deployment and ServiceAccount onto two work
 To follow this tutorial you will need Nova Control Plane with at least two workload clusters connected.
 You can check connected clusters using kubectl:
 
-    $ kubectl get clusters --show-labels
+    $ kubectl --context=nova get clusters --show-labels
     NAME              K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE   STANDBY   LABELS
     kind-workload-1   1.22          workload-1                    True    True   False     kubernetes.io/metadata.name=kind-workload-1,nova.elotl.co/cluster.novacreated=false,nova.elotl.co/cluster.provider=kind,nova.elotl.co/cluster.version=1.22
     kind-workload-2   1.22          workload-2                    True    True   False     kubernetes.io/metadata.name=kind-workload-2,nova.elotl.co/cluster.novacreated=false,nova.elotl.co/cluster.provider=kind,nova.elotl.co/cluster.version=1.22
@@ -94,8 +94,8 @@ Note: If your workload clusters have different names, you need to edit this poli
 
 We can now apply policy and nginx app to the Nova Control Plane:
 
-    $ kubectl apply -f sample-spread-scheduling/policy.yaml
-    $ kubectl apply -f sample-spread-scheduling/nginx-app.yaml
+    $ kubectl --context=nova apply -f sample-spread-scheduling/policy.yaml
+    $ kubectl --context=nova apply -f sample-spread-scheduling/nginx-app.yaml
 
 Nova should now create nginx Deployment with 5 replicas in `kind-workload-1` & `kind-workload-2`. Nova will sync Deployment status to the Control Plane:
 

@@ -12,36 +12,24 @@ Currently, we only support static placement where the user tells Nova the destin
 In this example, we use one kube-config with three defined contexts: 
 
 * `nova` for Nova Control Plane
-* `gke_elotl-dev_us-central1-c_nova-example-agent-1` for workload cluster 1
-* `gke_elotl-dev_us-central1-c_nova-example-agent-2` for workload cluster 2
+* `kind-workload-1` for workload cluster 1
+* `kind-workload-2` for workload cluster 2
 
 Your kube-contexts are likely named differently. To follow this tutorial, please set following environment variables to appropriate context names:
-
-* `export NOVA_CTX=nova`
-* `export WLC1_CTX=gke_elotl-dev_us-central1-c_nova-example-agent-1` (WLC is short for Workload Cluster)
-* `export WLC2_CTX=gke_elotl-dev_us-central1-c_nova-example-agent-2` (WLC is short for Workload Cluster)
-
-If you have Nova and workload clusters kubeconfigs in different file, you need to set correct `KUBECONFIG` environment variable before each command.
 
 Both workload clusters are connected to the Nova Control Plane. We will use the names of those clusters in the SchedulePolicy.
 You can check how your clusters are named in the Nova Control Plane:
 ```shell
-   kubectl --context="$NOVA_CTX" get clusters
+   kubectl --context=nova get clusters
    NAME                    K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE   STANDBY
-   my-workload-cluster-1   1.22          workload-1                    True    True   False
-   my-workload-cluster-2   1.22          workload-2                    True    True   False
+   kind-workload-1   1.22          workload-1                    True    True   False
+   kind-workload-2   1.22          workload-2                    True    True   False
 ```
 
 
-1. Open `sample-policy/policy.yaml` in text editor and edit line:
-```yaml
-  clusterSelector:
-    matchLabels:
-      kubernetes.io/metadata.name: my-workload-cluster-1 # change it to the name of one of your workload clusters
-```
-2. `kubectl --context="$NOVA_CTX" apply -f sample-policy/policy.yaml`. This policy is saying, for any objects with label `app: redis` or `app: guestbook`, schedule them to cluster `my-workload-cluster-1` (in your case, workload cluster name will be likely different).
-3. `kubectl --context="$NOVA_CTX" apply -f sample-policy/guestbook-all-in-one.yaml -n guestbook`. This schedules the guestbook stateless application into `my-workload-cluster-1`.
-4. `kubectl --context="$NOVA_CTX" get all -n guestbook`. You should be able to see something like the following:
+1. `kubectl --context=nova apply -f sample-policy/policy.yaml`. This policy is saying, for any objects with label `app: redis` or `app: guestbook`, schedule them to cluster `kind-workload-1` (in your case, workload cluster name will be likely different).
+2. `kubectl --context=nova apply -f sample-policy/guestbook-all-in-one.yaml -n guestbook`. This schedules the guestbook stateless application into `kind-workload-1`.
+3. `kubectl --context=nova get all -n guestbook`. You should be able to see something like the following:
     ```
     NAME                     TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)        AGE
     service/frontend         LoadBalancer   10.96.25.97    35.223.90.60   80:31528/TCP   82s
@@ -58,11 +46,11 @@ The external-ip of the frontend service should lead you to the main page of the 
 
 ### Workload migration
 
-Now let's say your `my-workload-cluster-1` will go through some maintenance and you want to migrate your guestbook application to `my-workload-cluster-2`.
+Now let's say your `kind-workload-1` will go through some maintenance and you want to migrate your guestbook application to `kind-workload-2`.
 You can achieve this by editing the schedulePolicy:
 
-1. `kubectl --context="$NOVA_CTX" edit schedulepolicy app-guestbook -n guestbook`. Update `my-workload-cluster-1` to `my-workload-cluster-2`.
-2. You should be able to see your workload deleted from `my-workload-cluster-1` and recreated in`my-workload-cluster-2`.
+1. `kubectl --context=nova edit schedulepolicy app-guestbook -n guestbook`. Update `kind-workload-1` to `kind-workload-2`.
+2. You should be able to see your workload deleted from `kind-workload-1` and recreated in`kind-workload-2`.
 
 
 ## Policy configuration

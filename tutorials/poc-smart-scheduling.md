@@ -30,16 +30,16 @@ Let's start with creating a namespace that we will use:
 
 1. `kubectl --context=kind-workload-1 create namespace microsvc-demo`
 2. `kubectl --context=kind-workload-2 create namespace microsvc-demo`
-3. `KUBECONFIG=./nova-installer-output/nova-kubeconfig kubectl create namespace microsvc-demo`
-4. `KUBECONFIG=./nova-installer-output/nova-kubeconfig kubectl apply -f sample-group-scheduling/policy.yaml` This policy is saying, for any objects with label `microServicesDemo: "yes"`, group them based on the *value of the "color" label* and schedule a group to any cluster which has enough resources to run them.
+3. `kubectl --context=nova create namespace microsvc-demo`
+4. `kubectl --context=nova apply -f sample-group-scheduling/policy.yaml` This policy is saying, for any objects with label `microServicesDemo: "yes"`, group them based on the *value of the "color" label* and schedule a group to any cluster which has enough resources to run them.
 5. Now, let's create green and blue instances of our app:
     ```shell
-    KUBECONFIG=./nova-installer-output/nova-kubeconfig kubectl apply -f sample-group-scheduling/blue-app.yaml -n microsvc-demo
-    KUBECONFIG=./nova-installer-output/nova-kubeconfig kubectl apply -f sample-group-scheduling/green-app.yaml -n microsvc-demo
+    kubectl --context=nova apply -f sample-group-scheduling/blue-app.yaml -n microsvc-demo
+    kubectl --context=nova apply -f sample-group-scheduling/green-app.yaml -n microsvc-demo
     ```
 6. Verifying whether the objects were assigned to the correct ScheduleGroup can be done by describing an object and looking at events:
     ```shell
-    $ kubectl describe deployment frontend -n microsvc-demo
+    $ kubectl --context=nova describe deployment frontend -n microsvc-demo
     Name:                   frontend
     Namespace:              microsvc-demo
     CreationTimestamp:      Wed, 01 Feb 2023 15:42:31 +0100
@@ -54,7 +54,7 @@ Let's start with creating a namespace that we will use:
     Normal  SchedulePolicyMatched  17s   nova-scheduler  schedule policy demo-policy will be used to determine target cluster
 
     ```
-7. You can check if two ScheduleGroups were created: `KUBECONFIG=./nova-installer-output/nova-kubeconfig kubectl get schedulegroups`
+7. You can check if two ScheduleGroups were created: `kubectl --context=nova get schedulegroups`
     ```shell
     NAME                   AGE
     demo-policy-4f068569   9s
@@ -73,8 +73,8 @@ Let's start with creating a namespace that we will use:
 9. From the output above, we can see which workload cluster is hosting each ScheduleGroup.
 10. Now, imagine you need to increase resource request or replica count on one of the microservices in the second app. In the meantime, there was other activity in the cluster and after your update there won't be enough resources in the cluster to satisfy your update.
     You can simulate this scenario using `sample-group-scheduling/hog-pod.yaml` manifest. You should edit it, so the hog-pod will take almost all resources in your cluster.
-    Now, you can apply it to the same cluster where `demo-policy-f73297b2` schedule group was scheduled (`kind-workload-2` in my case). `KUBECONFIG=./nova-installer-output/nova-kubeconfig kubectl apply -f sample-group-scheduling/hog-pod.yaml`
-11. Now let's increase replica count in frontend-2 microservice (which is one of the microservices in green app) in the Nova control plane: `KUBECONFIG=./nova-installer-output/nova-kubeconfig kubectl scale deploy/frontend-2 --replicas=5 -n microsvc-demo`
+    Now, you can apply it to the same cluster where `demo-policy-f73297b2` schedule group was scheduled (`kind-workload-2` in my case). `kubectl --context=nova apply -f sample-group-scheduling/hog-pod.yaml`
+11. Now let's increase replica count in frontend-2 microservice (which is one of the microservices in green app) in the Nova control plane: `kubectl --context=nova scale deploy/frontend-2 --replicas=5 -n microsvc-demo`
 12. If there is enough resources to satisfy new schedule group requirements (existing resource request for 9 microservices + increased replica count of `frontend-2`), watching schedule group will show you schedule group being rescheduled to another cluster: `KUBECONFIG=./nova-installer-output/nova-kubeconfig kubectl nova get schedulegroups`
     ```shell
      NAME                 NOVA WORKLOAD CLUSTER                   NOVA POLICY NAME    
@@ -85,7 +85,7 @@ Let's start with creating a namespace that we will use:
       demo-policy-f73297b2  kind-workload-1                           demo-policy         
       ------------------  --------------------------------------  --------------------------------------
     ```
-13. To understand why the ScheduleGroup was rescheduled, we can use `kubectl describe schedulegroup <group-name>` and see the event message:
+13. To understand why the ScheduleGroup was rescheduled, we can use `kubectl --context=nova describe schedulegroup <group-name>` and see the event message:
     ```shell
         Name:                demo-policy-f73297b2 
         Labels:              color=green
@@ -99,7 +99,7 @@ Let's start with creating a namespace that we will use:
         Warning  ReschedulingTriggered                 106s                 nova-agent      deployment microsvc-demo/frontend-2 does not have minimum replicas available
 
     ```
-14. You can verify that green app is running by listing deployment in Nova Control Plane: `KUBECONFIG=./nova-installer-output/nova-kubeconfig kubectl get deployments -n microsvc-demo -l color=green`
+14. You can verify that green app is running by listing deployment in Nova Control Plane: `kubectl --context=nova get deployments -n microsvc-demo -l color=green`
     ```
     NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
     adservice-2               1/1     1            1           2m1s
@@ -116,4 +116,4 @@ Let's start with creating a namespace that we will use:
     shippingservice-2         1/1     1            1           2m2s
     ```
 
-15. To remove all objects created for this demo, remove `microsvc-demo` namespace: `KUBECONFIG=./nova-installer-output/nova-kubeconfig kubectl delete ns microsvc-demo`
+15. To remove all objects created for this demo, remove `microsvc-demo` namespace: `kubectl --context=nova delete ns microsvc-demo`
