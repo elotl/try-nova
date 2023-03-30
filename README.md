@@ -63,6 +63,7 @@ $ KUBECONFIG="./scripts/nova-installer-output/nova-kubeconfig" kubectl get clust
 * [Policy Based Scheduling](tutorials/poc-policy-based-scheduling.md)
 * [Smart Scheduling](tutorials/poc-smart-scheduling.md)
 * [JIT Standby Workload Cluster](tutorials/poc-standby-workload-cluster.md)
+* [Using Nova CLI](tutorials/nova-cli-usage.md)
 
 ### Supported api-resources
 
