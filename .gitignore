@@ -1,0 +1,2 @@
+./kubeconfig-e2e-test-*
+scripts/nova-installer-output/

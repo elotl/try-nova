@@ -1,0 +1,76 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: schedulegroups.policy.elotl.co
+spec:
+  group: policy.elotl.co
+  names:
+    kind: ScheduleGroup
+    listKind: ScheduleGroupList
+    plural: schedulegroups
+    singular: schedulegroup
+  scope: Cluster
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: ScheduleGroup is a CR which entire lifecycle is maintained by
+          Nova controllers. It can serve to end user as a debug info.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          lastStatusUpdate:
+            format: date-time
+            type: string
+          metadata:
+            type: object
+          objectRefs:
+            items:
+              properties:
+                group:
+                  type: string
+                kind:
+                  type: string
+                name:
+                  type: string
+                namespace:
+                  type: string
+                version:
+                  type: string
+              required:
+              - group
+              - kind
+              - name
+              - namespace
+              - version
+              type: object
+            type: array
+          policy:
+            properties:
+              name:
+                type: string
+              namespace:
+                type: string
+            required:
+            - name
+            - namespace
+            type: object
+          scheduled:
+            type: boolean
+        required:
+        - policy
+        type: object
+    served: true
+    storage: true

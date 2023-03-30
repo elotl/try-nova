@@ -1,0 +1,12 @@
+{
+  "CN": "kube-apiserver-client",
+  "names": [
+    {
+      "O": "system:masters"
+    }
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  }
+}

@@ -1,0 +1,39 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nova-log-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "list"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nova-log-reader
+  namespace: ${NAMESPACE}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nova-log-reader
+subjects:
+- kind: ServiceAccount
+  name: nova-log-reader
+  namespace: ${NAMESPACE}
+roleRef:
+  kind: ClusterRole
+  name: nova-log-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nova-log-reader-secret
+  namespace: ${NAMESPACE}
+  labels:
+    nova.elotl.co/service-account.name: nova-log-reader
+  annotations:
+    kubernetes.io/service-account.name: nova-log-reader
+type: kubernetes.io/service-account-token
+---
