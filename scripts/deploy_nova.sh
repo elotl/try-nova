@@ -352,13 +352,6 @@ function install_agent {
     echo "--- Example: ./deploy_nova.sh \"\" workload-cluster-context cluster-1"
     }
 
-    if [ -z "$NOVA_AGENT_CONTEXT" -o \
-    -z "$AGENT_CLUSTER_NAME" -o ]
-    then
-    print_usage
-    exit 1
-    fi
-
     source $PARENT_DIR/common.sh
 
     CLUSTER_WITH_NAME_EXISTS=$(KUBECONFIG=${NOVA_KUBECONFIG_FILE} kubectl get cluster "${AGENT_CLUSTER_NAME}" -o jsonpath='{.spec.name}' 2>/dev/null || true)

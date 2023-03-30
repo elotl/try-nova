@@ -12,11 +12,19 @@ To setup 3 kind clusters, and install Nova Control Plane + connect two kind clus
 
     $ ./scripts/setup_trial_env_on_kind.sh
 
-Once installation finished, you can 
+Once installation finished, you can use following command to export Nova Control Plane kubeconfig + kubeconfigs of hosting and workload clusters:
+
+    $ export KUBECONFIG=$PWD/scripts/nova-installer-output/nova-kubeconfig:$PWD/kubeconfig-e2e-test-cp:$PWD/kubeconfig-e2e-test-workload-1:$PWD/kubeconfig-e2e-test-workload-2
+
+This gives you access to Nova Control Plane (`nova` context), cluster hosting Nova Control Plane (context  `kind-cp`) and two workload clusters (context `kind-workload-1` and `kind-workload-2`)
+
+To interact with Nova control plane, use `--context=nova` flag in kubectl commands, e.g.:
+
+    $ kubectl --context=nova get clusters
 
 To get more insight into the clusters available resources:
 ```
-$ KUBECONFIG="./scripts/nova-installer-output/nova-kubeconfig" kubectl get clusters -o go-template-file=./scripts/kubectl_templates/cluster_output.gotemplate
+$ kubectl --context=nova get clusters -o go-template-file=./scripts/kubectl_templates/cluster_output.gotemplate
 
   | CLUSTER NAME                  | K8S VERSION | CLOUD PROVIDER | REGION        | STATUS        |
   |----------------------------------------------------------------------------------------------|
