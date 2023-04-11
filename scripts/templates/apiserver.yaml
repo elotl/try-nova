@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: apiserver
-          image: k8s.gcr.io/kube-apiserver:v1.21.7
+          image: registry.k8s.io/kube-apiserver:v1.21.7
           command:
             - kube-apiserver
             # - --allow-privileged=true
