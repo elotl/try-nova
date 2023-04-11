@@ -17,70 +17,77 @@ You can check connected clusters using kubectl:
 
 Here is ServiceAccount & Deployment we want to spread:
 
+```shell
     $ cat <<EOF > sample-spread-scheduling/nginx-app.yaml
-    apiVersion: apps/v1
-    kind: Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: default
+  labels:
+    app: nginx
+    group-policy: nginx-spread
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: nginx
+  template:
     metadata:
-      name: nginx
-      namespace: default
       labels:
         app: nginx
         group-policy: nginx-spread
     spec:
-      replicas: 10
-      selector:
-        matchLabels:
-          app: nginx
-      template:
-        metadata:
-          labels:
-            app: nginx
-            group-policy: nginx-spread
-        spec:
-          serviceAccountName: nginx-sa
-          containers:
-          - name: nginx
-            image: nginx:1.14.2
-            ports:
-            - containerPort: 80
-    ---
-    apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      name: nginx-sa
-      namespace: default
-      labels:
-        app: nginx
-        group-policy: nginx-spread
-    EOF
+      serviceAccountName: nginx-sa
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nginx-sa
+  namespace: default
+  labels:
+    app: nginx
+    group-policy: nginx-spread
+EOF
+```
+
 
 Now, we need to define SchedulePolicy matching those two objects.
 We want to run 50% of replicas in `kind-workload-1` cluster and 50% in `kind-workload-2`. ServiceAccount needs to be present in both clusters.
 
+```shell
     $ cat <<EOF > sample-spread-scheduling/policy.yaml
-    apiVersion: policy.elotl.co/v1alpha1
-    kind: SchedulePolicy
-    metadata:
-      name: spread-group-policy
-    spec:
-      namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: default
-      groupBy:
-        labelKey: app
-      spreadConstraints:
-        topologyKey: kubernetes.io/metadata.name
-      clusterSelector:
-        matchExpressions:
-        - key: kubernetes.io/metadata.name
-          operator: In
-          values:
-          - kind-workload-1
-          - kind-workload-2
-      resourceSelectors:
-        labelSelectors:
-        - matchLabels:
-            group-policy: nginx-spread
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: spread-group-policy
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: default
+  groupBy:
+    labelKey: app
+  spreadConstraints:
+    topologyKey: kubernetes.io/metadata.name
+  clusterSelector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name
+      operator: In
+      values:
+      - kind-workload-1
+      - kind-workload-2
+  resourceSelectors:
+    labelSelectors:
+    - matchLabels:
+        group-policy: nginx-spread
+EOF
+```
+
 
 Let's explain each field in .spec:
 
@@ -130,36 +137,39 @@ Let's verify if 5 replicas run in both clusters:
 ### Define % split of replicas
 Nova also provides a way to define not even split of replicas between workload clusters. For that purpose, you need to specify this constraint in SchedulePolicy's `.spec.spreadConstraints`.
 
-
+```shell
     $ cat <<EOF > sample-spread-scheduling/policy-percentage.yaml
-    apiVersion: policy.elotl.co/v1alpha1
-    kind: SchedulePolicy
-    metadata:
-      name: spread-group-policy
-    spec:
-      namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: default
-      groupBy:
-        labelKey: app
-      spreadConstraints:
-        topologyKey: kubernetes.io/metadata.name
-        percentageSplit:
-        - topologyValue: kind-workload-1
-          percentage: 20
-        - topologyValue: kind-workload-2
-          percentage: 80
-      clusterSelector:
-        matchExpressions:
-        - key: kubernetes.io/metadata.name
-          operator: In
-          values:
-          - kind-workload-1
-          - kind-workload-2
-      resourceSelectors:
-        labelSelectors:
-        - matchLabels:
-            group-policy: nginx-spread
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: spread-group-policy
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: default
+  groupBy:
+    labelKey: app
+  spreadConstraints:
+    topologyKey: kubernetes.io/metadata.name
+    percentageSplit:
+    - topologyValue: kind-workload-1
+      percentage: 20
+    - topologyValue: kind-workload-2
+      percentage: 80
+  clusterSelector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name
+      operator: In
+      values:
+      - kind-workload-1
+      - kind-workload-2
+  resourceSelectors:
+    labelSelectors:
+    - matchLabels:
+        group-policy: nginx-spread
+EOF
+```
+
 
 We added `percentageSplit` field, which says "Run 20% of replicas in a workload cluster with `kubernetes.io/metadata.name=kind-workload-1` and 80% in `kubernetes.io/metadata.name=kind-workload-2` workload cluster"
 
