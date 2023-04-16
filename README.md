@@ -2,7 +2,7 @@
 
 This README includes:
 1. An installation guide for Nova on KIND clusters.
-The scripts in this repo will allow you to create a sandbox environment for using Nova's trial version (for managing up to 3 workload clusters). If you are interested in using the full version, please contact us at info@elotl.com.
+The scripts in this repo will allow you to create a sandbox environment for using Nova's trial version (for managing up to 3 workload clusters). If you are interested in using the full version, please contact us at info@elotl.co
 2. Tutorials that walk you through the core functionalities of Nova.
 
 We love feedback, so please feel free to ask questions by creating an issue in this repo or writing to us at info@elotl.co
