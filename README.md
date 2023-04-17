@@ -1,4 +1,13 @@
 # Nova Quickstart
+[![Slack][Slack-Image]][Slack-Url]  [![Docs][Docs-Image]][Docs-Url] [![Elotl Inc.][Elotl-Image]][Elotl-Url]
+
+
+[Docs-Image]: https://img.shields.io/badge/nova-docs-blue
+[Docs-Url]: https://docs.elotl.co/nova/intro
+[Elotl-Image]: https://img.shields.io/badge/Elotl-home-blue
+[Elotl-Url]: https://www.elotl.co/
+[Slack-Image]: https://img.shields.io/badge/chat-on%20slack-green
+[Slack-Url]: https://join.slack.com/t/elotl-free-trial/shared_invite/zt-1tciz8cck-H9Swzl2grCqPaLJeHYtbBQ
 
 This README includes:
 1. An installation guide for Nova on KIND clusters.
