@@ -70,4 +70,4 @@ Nova supports the following standard Kubernetes objects as well as CRDs:
 
 # Beyond KIND
 
-If you'd like to try Nova on the cloud (AWS, GCP, Azure, OCI, on-prem), please grab free trial bits at https://www.elotl.co/request-free-trial.html
+If you'd like to try Nova on the cloud (AWS, GCP, Azure, OCI, on-prem), please grab free trial bits at https://www.elotl.co/free-trial.html
