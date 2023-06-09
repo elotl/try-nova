@@ -26,9 +26,9 @@ sed -i.bak 's/targetPort: 6443/& \n      nodePort: 32222/g' "${REPO_ROOT}"/scrip
 rm "${REPO_ROOT}"/scripts/templates/apiserver-service.yaml.bak
 
 
-export SCHEDULER_IMAGE_TAG="v0.5.1-rc8"
+export SCHEDULER_IMAGE_TAG="v0.5.1"
 export SCHEDULER_IMAGE_REPO="elotl/nova-scheduler-trial"
-export AGENT_IMAGE_TAG="v0.5.1-rc8"
+export AGENT_IMAGE_TAG="v0.5.1"
 export AGENT_IMAGE_REPO="elotl/nova-agent-trial"
 
 pushd "${REPO_ROOT}"/scripts

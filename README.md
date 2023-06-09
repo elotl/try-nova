@@ -45,10 +45,10 @@ To get more insight into the cluster's available resources:
 
 ## Nova Tutorials
 
-* [Annotation-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-annotation-based-scheduling)
-* [Policy-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-policy-based-scheduling)
-* [Capacity-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-capacity-based-scheduling)
-* [Just-in-time Standby Workload Clusters](https://docs.elotl.co/nova/Tutorials/poc-standby-workload-cluster)
+* [Annotation-based Scheduling](tutorials/poc-annotation-based-scheduling.md)
+* [Policy-based Scheduling](tutorials/poc-policy-based-scheduling.md)
+* [Capacity-based Scheduling](tutorials/poc-smart-scheduling.md)
+* [Spread Scheduling](tutorials/poc-spread-onto-multiple-clusters.md)
 * [Using Nova CLI](tutorials/nova-cli-usage.md)
 
 ### Supported api-resources
