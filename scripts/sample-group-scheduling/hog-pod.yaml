@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    # update it with a name of the workload cluster in Nova control plane which you want to hog
+    nova.elotl.co/cluster: kind-workload-1
+  labels:
+    app: nginx
+  namespace: default
+  name: hog-pod
+spec:
+  containers:
+  - image: nginx:1.14.2
+    imagePullPolicy: IfNotPresent
+    name: nginx
+    resources:
+      requests:
+        # Update cpu and memory with values that will occupy the most of your cluster resources
+        cpu: 7000m
+        memory: 250M
