@@ -47,6 +47,13 @@ spec:
         - inf
 EOF
 ```
+
+Let's apply it to the Nova Control Plane:
+
+
+    $ kubectl --context=nova apply -f sample-spread-scheduling/busybox.yaml
+
+
 Now, we can watch busybox deployment reaching 2 available replicas in the Nova Control Plane:
 
     $ kubectl --context=nova get deployment busybox -w
