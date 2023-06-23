@@ -31,11 +31,11 @@ Let's start with creating a namespace that we will use:
 1. `kubectl --context=kind-workload-1 create namespace microsvc-demo`
 2. `kubectl --context=kind-workload-2 create namespace microsvc-demo`
 3. `kubectl --context=nova create namespace microsvc-demo`
-4. `kubectl --context=nova apply -f sample-group-scheduling/policy.yaml` This policy is saying, for any objects with label `microServicesDemo: "yes"`, group them based on the *value of the "color" label* and schedule a group to any cluster which has enough resources to run them.
+4. `kubectl --context=nova apply -f examples/sample-group-scheduling/policy.yaml` This policy is saying, for any objects with label `microServicesDemo: "yes"`, group them based on the *value of the "color" label* and schedule a group to any cluster which has enough resources to run them.
 5. Now, let's create green and blue instances of our app:
     ```shell
-    kubectl --context=nova apply -f sample-group-scheduling/blue-app.yaml -n microsvc-demo
-    kubectl --context=nova apply -f sample-group-scheduling/green-app.yaml -n microsvc-demo
+    kubectl --context=nova apply -f examples/sample-group-scheduling/blue-app.yaml -n microsvc-demo
+    kubectl --context=nova apply -f examples/sample-group-scheduling/green-app.yaml -n microsvc-demo
     ```
 6. Verifying whether the objects were assigned to the correct ScheduleGroup can be done by describing an object and looking at events:
     ```shell
@@ -72,8 +72,8 @@ Let's start with creating a namespace that we will use:
     ```
 9. From the output above, we can see which workload cluster is hosting each ScheduleGroup.
 10. Now, imagine you need to increase resource request or replica count on one of the microservices in the second app. In the meantime, there was other activity in the cluster and after your update there won't be enough resources in the cluster to satisfy your update.
-    You can simulate this scenario using `sample-group-scheduling/hog-pod.yaml` manifest. You should edit it, so the hog-pod will take almost all resources in your cluster.
-    Now, you can apply it to the same cluster where `demo-policy-f73297b2` schedule group was scheduled (`kind-workload-2` in my case). `kubectl --context=nova apply -f sample-group-scheduling/hog-pod.yaml`
+    You can simulate this scenario using `examples/sample-group-scheduling/hog-pod.yaml` manifest. You should edit it, so the hog-pod will take almost all resources in your cluster.
+    Now, you can apply it to the same cluster where `demo-policy-f73297b2` schedule group was scheduled (`kind-workload-2` in my case). `kubectl --context=nova apply -f examples/sample-group-scheduling/hog-pod.yaml`
 11. Now let's increase replica count in frontend-2 microservice (which is one of the microservices in green app) in the Nova control plane: `kubectl --context=nova scale deploy/frontend-2 --replicas=5 -n microsvc-demo`
 12. If there is enough resources to satisfy new schedule group requirements (existing resource request for 9 microservices + increased replica count of `frontend-2`), watching schedule group will show you schedule group being rescheduled to another cluster: `KUBECONFIG=./nova-installer-output/nova-kubeconfig kubectl nova get schedulegroups`
     ```shell

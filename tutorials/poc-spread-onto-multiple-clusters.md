@@ -19,7 +19,7 @@ Before we start, let's talk about how Nova schedules Kubernetes workloads. On th
 Let's see it with a basic example:
 
 ```shell
-    $ cat <<EOF > sample-spread-scheduling/busybox.yaml
+    $ cat <<EOF > examples/sample-spread-scheduling/busybox.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -51,7 +51,7 @@ EOF
 Let's apply it to the Nova Control Plane:
 
 
-    $ kubectl --context=nova apply -f sample-spread-scheduling/busybox.yaml
+    $ kubectl --context=nova apply -f examples/sample-spread-scheduling/busybox.yaml
 
 
 Now, we can watch busybox deployment reaching 2 available replicas in the Nova Control Plane:
@@ -80,7 +80,7 @@ Also, splitting number of replicas equally is not always desired. Let's delete b
 Here is ServiceAccount & Deployment we want to spread:
 
 ```shell
-    $ cat <<EOF > sample-spread-scheduling/nginx-app.yaml
+    $ cat <<EOF > examples/sample-spread-scheduling/nginx-app.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -123,7 +123,7 @@ Now, we need to define SchedulePolicy matching those two objects.
 We want to run 50% of replicas in `kind-workload-1` cluster and 50% in `kind-workload-2`. ServiceAccount needs to be present in both clusters.
 
 ```shell
-    $ cat <<EOF > sample-spread-scheduling/policy.yaml
+    $ cat <<EOF > examples/sample-spread-scheduling/policy.yaml
 apiVersion: policy.elotl.co/v1alpha1
 kind: SchedulePolicy
 metadata:
@@ -163,8 +163,8 @@ Note: If your workload clusters have different names, you need to edit this poli
 
 We can now apply policy and nginx app to the Nova Control Plane:
 
-    $ kubectl --context=nova apply -f sample-spread-scheduling/policy.yaml
-    $ kubectl --context=nova apply -f sample-spread-scheduling/nginx-app.yaml
+    $ kubectl --context=nova apply -f examples/sample-spread-scheduling/policy.yaml
+    $ kubectl --context=nova apply -f examples/sample-spread-scheduling/nginx-app.yaml
 
 Nova should now create nginx Deployment with 5 replicas in `kind-workload-1` & `kind-workload-2`. Nova will sync Deployment status to the Control Plane:
 
@@ -200,7 +200,7 @@ Let's verify if 5 replicas run in both clusters:
 Nova also provides a way to define not even split of replicas between workload clusters. For that purpose, you need to specify this constraint in SchedulePolicy's `.spec.spreadConstraints`.
 
 ```shell
-    $ cat <<EOF > sample-spread-scheduling/policy-percentage.yaml
+    $ cat <<EOF > examples/sample-spread-scheduling/policy-percentage.yaml
 apiVersion: policy.elotl.co/v1alpha1
 kind: SchedulePolicy
 metadata:
@@ -237,7 +237,7 @@ We added `percentageSplit` field, which says "Run 20% of replicas in a workload 
 
 We can apply this policy now, and Nova will apply changes to match the constraints we specified.
 
-    $ kubectl --context=nova apply -f sample-spread-scheduling/policy-percentage.yaml
+    $ kubectl --context=nova apply -f examples/sample-spread-scheduling/policy-percentage.yaml
 
 When you update spreadConstraints in the SchedulePolicy, Nova will always re-balance the split to ensure that your requirements are met.
 
@@ -265,6 +265,6 @@ NOTE: For k8s resources which aren't pod controllers (pod controllers such as De
 
 To clean up all resources created in this tutorial, run:
 
-    $ kubectl --context=nova delete -f sample-spread-scheduling/nginx-app.yaml
-    $ kubectl --context=nova delete -f sample-spread-scheduling/policy-percentage.yaml
+    $ kubectl --context=nova delete -f examples/sample-spread-scheduling/nginx-app.yaml
+    $ kubectl --context=nova delete -f examples/sample-spread-scheduling/policy-percentage.yaml
 
