@@ -1,0 +1,73 @@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nova-agent
+  namespace: elotl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nova-agent
+      app.kubernetes.io/part-of: elotl-nova
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nova-agent
+        app.kubernetes.io/part-of: elotl-nova
+    spec:
+      serviceAccountName: nova-agent
+      containers:
+      - name: nova-agent
+        image: ${IMAGE_REPO}:${IMAGE_TAG}
+        imagePullPolicy: IfNotPresent
+        command:
+          - /nova-agent
+          - --cluster-name=${AGENT_CLUSTER_NAME}
+          - --control-plane-kubeconfig=/etc/nova/kubeconfig
+        volumeMounts:
+          - mountPath: /etc/nova/
+            name: nova-kubeconfig
+            readOnly: true
+      volumes:
+        - name: nova-kubeconfig
+          secret:
+            secretName: nova-kubeconfig
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nova-agent
+  namespace: elotl
+imagePullSecrets:
+- name: elotl
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nova-agent
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+  - nonResourceURLs: ['*']
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nova-agent
+  namespace: elotl
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: nova-agent
+subjects:
+  - kind: ServiceAccount
+    name: nova-agent
+    namespace: elotl
+

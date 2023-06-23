@@ -1,0 +1,17 @@
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: app-guestbook
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: guestbook
+  clusterSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: kind-workload-1 
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          app: redis
+      - matchLabels:
+          app: guestbook
