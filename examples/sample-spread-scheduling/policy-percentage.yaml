@@ -1,0 +1,28 @@
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: spread-group-policy
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: default
+  groupBy:
+    labelKey: app
+  spreadConstraints:
+    topologyKey: kubernetes.io/metadata.name
+    percentageSplit:
+    - topologyValue: kind-workload-1
+      percentage: 20
+    - topologyValue: kind-workload-2
+      percentage: 80
+  clusterSelector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name
+      operator: In
+      values:
+      - kind-workload-1
+      - kind-workload-2
+  resourceSelectors:
+    labelSelectors:
+    - matchLabels:
+        group-policy: nginx-spread

@@ -1,0 +1,14 @@
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: demo-policy
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: microsvc-demo
+  groupBy:
+    labelKey: color
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          microServicesDemo: "yes"
