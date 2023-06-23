@@ -1,0 +1,13 @@
+{
+  "CN": "kube-etcd",
+  "hosts": [
+    "*.${NAMESPACE}.svc.cluster.local",
+    "*.${NAMESPACE}.svc",
+    "localhost",
+    "127.0.0.1"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  }
+}
