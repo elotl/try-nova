@@ -198,7 +198,7 @@ Let's verify if 5 replicas run in both clusters:
 
 ### Define % split of replicas
 Nova also provides a way to define not even split of replicas between workload clusters. For that purpose, you need to specify this constraint in SchedulePolicy's `.spec.spreadConstraints`.
-
+Now, we will create an updated version of the same policy, but with spread constraints defined.
 ```shell
     $ cat <<EOF > examples/sample-spread-scheduling/policy-percentage.yaml
 apiVersion: policy.elotl.co/v1alpha1
@@ -235,7 +235,7 @@ EOF
 
 We added `percentageSplit` field, which says "Run 20% of replicas in a workload cluster with `kubernetes.io/metadata.name=kind-workload-1` and 80% in `kubernetes.io/metadata.name=kind-workload-2` workload cluster"
 
-We can apply this policy now, and Nova will apply changes to match the constraints we specified.
+We can apply modified policy manifest now, and Nova will apply changes to match the constraints we specified.
 
     $ kubectl --context=nova apply -f examples/sample-spread-scheduling/policy-percentage.yaml
 
