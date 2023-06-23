@@ -3,8 +3,7 @@ kind: CronTab
 metadata:
   name: my-new-cron-object
   annotations:
-    # Edit me: please insert workload-cluster-unique-identifier here
-    # nova.elotl.co/cluster: <workload-cluster-unique-identifier>
+     nova.elotl.co/cluster: kind-workload-1
 spec:
   cronSpec: "* * * * */5"
   image: my-awesome-cron-image
