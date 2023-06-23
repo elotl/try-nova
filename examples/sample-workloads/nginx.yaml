@@ -6,7 +6,7 @@ metadata:
     app: nginx
   annotations:
      # Edit me: please insert workload-cluster-unique-identifier here if you go with annotation based scheduling
-     nova.elotl.co/cluster: my-workload-cluster-1 
+     nova.elotl.co/cluster: kind-workload-1 
 spec:
   replicas: 2
   selector:
