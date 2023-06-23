@@ -7,7 +7,6 @@ Nova currently supports three ways to schedule a workload - annotation-based sch
 ### Policy Based Scheduling Testing Example
 
 Policy based scheduling is done via scheduling is through Nova's SchedulePolicy CRD. A schedule policy contains one or more resource selectors, and a placement to tell how the scheduling should happen for matching resources.
-Currently, we only support static placement where the user tells Nova the destination workload cluster. Dynamic scheduling based on resource availability/cost/custom metrics is on the roadmap.
 
 In this example, we use one kube-config with three defined contexts: 
 
