@@ -27,7 +27,7 @@ You can check how your clusters are named in the Nova Control Plane:
 ```
 
 
-1. `kubectl --context=nova apply -f sample-policy/policy.yaml`. This policy is saying, for any objects with label `app: redis` or `app: guestbook`, schedule them to cluster `kind-workload-1` (in your case, workload cluster name will be likely different).
+1. `kubectl --context=nova apply -f sample-policy/policy.yaml`. This policy is saying, for any objects with label `app: redis` or `app: guestbook`, schedule them to cluster `kind-workload-1`.
 2. `kubectl --context=nova apply -f sample-policy/guestbook-all-in-one.yaml -n guestbook`. This schedules the guestbook stateless application into `kind-workload-1`.
 3. `kubectl --context=nova get all -n guestbook`. You should be able to see something like the following:
     ```
