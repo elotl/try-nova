@@ -71,15 +71,15 @@ cd "${REPO_ROOT}"
 
 # Setup Metal Load Balancer for CP cluster:
 echo "--- configuring Metal Load Balancer for kind-cp cluster..."
-source ./setup_kind_cluster.sh "./kubeconfig-e2e-test-cp"
+source ./scripts/setup_metal_lb.sh "./kubeconfig-e2e-test-cp"
 
 # Setup Metal Load Balancer for Workload 1 cluster:
 echo "--- configuring Metal Load Balancer for kind-workload-1 cluster..."
-source ./setup_kind_cluster.sh "./kubeconfig-e2e-test-workload-1"
+source ./scripts/setup_metal_lb.sh "./kubeconfig-e2e-test-workload-1"
 
 # Setup Metal Load Balancer for Workload 2 cluster:
 echo "--- configuring Metal Load Balancer for kind-workload-2 cluster..."
-source ./setup_kind_cluster.sh "./kubeconfig-e2e-test-workload-2"
+source ./scripts/setup_metal_lb.sh "./kubeconfig-e2e-test-workload-2"
 
 echo "--- Metal Load Balancer installed in kind-cp cluster."
 echo "--- Metal Load Balancer installed in kind-workload-1 cluster."
