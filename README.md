@@ -49,7 +49,6 @@ To get more insight into the cluster's available resources:
 * [Policy-based Scheduling](tutorials/poc-policy-based-scheduling.md)
 * [Capacity-based Scheduling](tutorials/poc-smart-scheduling.md)
 * [Spread Scheduling](tutorials/poc-spread-onto-multiple-clusters.md)
-* [Using Nova CLI](tutorials/nova-cli-usage.md)
 
 ### Supported api-resources
 
