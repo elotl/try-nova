@@ -2,6 +2,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: crontabs.stable.example.com
+  annotations:
+    nova.elotl.co/cluster: kind-workload-1
 spec:
   group: stable.example.com
   versions:
