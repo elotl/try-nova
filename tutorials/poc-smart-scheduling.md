@@ -30,7 +30,7 @@ Let's start with creating a namespace that we will use:
 
 1. `kubectl --context=kind-workload-1 create namespace microsvc-demo`
 2. `kubectl --context=kind-workload-2 create namespace microsvc-demo`
-3. `kubectl --context=nova create namespace microsvc-demo`
+3. `kubectl --context=nova apply -f examples/sample-group-scheduling/microsvc-demo-ns.yaml`
 4. `kubectl --context=nova apply -f examples/sample-group-scheduling/policy.yaml` This policy is saying, for any objects with label `microServicesDemo: "yes"`, group them based on the *value of the "color" label* and schedule a group to any cluster which has enough resources to run them.
 5. Now, let's create green and blue instances of our app:
     ```shell
