@@ -71,26 +71,19 @@ cd "${REPO_ROOT}"
 
 # Setup Metal Load Balancer for CP cluster:
 echo "--- configuring Metal Load Balancer for kind-cp cluster..."
-KUBECONFIG="./kubeconfig-e2e-test-cp" kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml
-KUBECONFIG="./kubeconfig-e2e-test-cp" kubectl patch -n metallb-system deploy controller --type='json' -p '[{"op": "add", "path": "/spec/strategy/rollingUpdate/maxUnavailable", "value": 0}]'
+source ./scripts/setup_metal_lb.sh "./kubeconfig-e2e-test-cp"
 
-# subnet for kind bridge: https://kind.sigs.k8s.io/docs/user/loadbalancer/
-gateway=$(docker network inspect -f '{{json (index .IPAM.Config 0).Gateway}}' kind | xargs)
-suffix="0.1"
-foo=${gateway%"$suffix"}
-export RANGE_START=$(echo $foo"255.200")
-export RANGE_END=$(echo  $foo"255.255")
-envsubst < "${REPO_ROOT}/scripts/metal_lb_addrpool_template.yaml" > "./metal_lb_addrpool.yaml"
-echo "--- Metal LB config:"
-cat ./metal_lb_addrpool.yaml
-KUBECONFIG="./kubeconfig-e2e-test-cp" kubectl -n metallb-system wait pod --all --timeout=90s --for=condition=Ready
-KUBECONFIG="./kubeconfig-e2e-test-cp" kubectl -n metallb-system wait deploy controller --timeout=90s --for=condition=Available
-KUBECONFIG="./kubeconfig-e2e-test-cp" kubectl -n metallb-system wait apiservice v1beta1.metallb.io --timeout=90s --for=condition=Available
-KUBECONFIG="./kubeconfig-e2e-test-cp" kubectl apply -f ./metal_lb_addrpool.yaml
-rm ./metal_lb_addrpool.yaml
+# Setup Metal Load Balancer for Workload 1 cluster:
+echo "--- configuring Metal Load Balancer for kind-workload-1 cluster..."
+source ./scripts/setup_metal_lb.sh "./kubeconfig-e2e-test-workload-1"
 
+# Setup Metal Load Balancer for Workload 2 cluster:
+echo "--- configuring Metal Load Balancer for kind-workload-2 cluster..."
+source ./scripts/setup_metal_lb.sh "./kubeconfig-e2e-test-workload-2"
 
 echo "--- Metal Load Balancer installed in kind-cp cluster."
+echo "--- Metal Load Balancer installed in kind-workload-1 cluster."
+echo "--- Metal Load Balancer installed in kind-workload-2 cluster."
 echo "--- clusters ready for nova-scheduler and nova-agent deployments."
 echo "--- kubeconfig for kind-cp cluster: ./kubeconfig-e2e-test-cp"
 echo "--- kubeconfig for kind-workload-1 cluster: ./kubeconfig-e2e-test-workload-1"
