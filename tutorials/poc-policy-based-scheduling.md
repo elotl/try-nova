@@ -26,12 +26,12 @@ You can check how your clusters are named in the Nova Control Plane:
 ```
 
 
-1. `kubectl --context=nova apply -f sample-policy/policy.yaml`. This policy is saying, for any objects with label `app: redis` or `app: guestbook`, schedule them to cluster `kind-workload-1`.
-2. `kubectl --context=nova apply -f sample-policy/guestbook-all-in-one.yaml -n guestbook`. This schedules the guestbook stateless application into `kind-workload-1`.
+1. `kubectl --context=nova apply -f examples/sample-policy/policy.yaml`. This policy is saying, for any objects with label `app: redis` or `app: guestbook`, schedule them to cluster `kind-workload-1`.
+2. `kubectl --context=nova apply -f examples/sample-policy/guestbook-all-in-one.yaml -n guestbook`. This schedules the guestbook stateless application into `kind-workload-1`.
 3. `kubectl --context=nova get all -n guestbook`. You should be able to see something like the following:
     ```
     NAME                     TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)        AGE
-    service/frontend         LoadBalancer   10.96.25.97    35.223.90.60   80:31528/TCP   82s
+    service/frontend         LoadBalancer   10.96.25.97    35.223.90.60      80:31528/TCP   82s
     service/redis-follower   ClusterIP      10.96.251.47   <none>         6379/TCP       83s
     service/redis-leader     ClusterIP      10.96.27.169   <none>         6379/TCP       83s
 
