@@ -16,13 +16,6 @@ The scripts in this repo will allow you to create a sandbox environment for usin
 
 We love feedback, so please feel free to ask questions by creating an issue in this repo, joining our Slack: [Elotl Free Trial](https://join.slack.com/t/elotl-free-trial/shared_invite/zt-1tciz8cck-H9Swzl2grCqPaLJeHYtbBQ) or writing to us at info@elotl.co
 
-## Prerequisites
-
-You should have:
-
-- Installed and running Docker
-- Installed [Kind](https://kind.sigs.k8s.io/)
-
 ## Installation on KIND (Kubernetes in Docker) clusters
 
 This script will allow you to create and configure 3 kind clusters - one of them will be the Nova Control Plane and the other two will be Nova workload clusters.
@@ -56,6 +49,7 @@ To get more insight into the cluster's available resources:
 * [Policy-based Scheduling](tutorials/poc-policy-based-scheduling.md)
 * [Capacity-based Scheduling](tutorials/poc-smart-scheduling.md)
 * [Spread Scheduling](tutorials/poc-spread-onto-multiple-clusters.md)
+* [Using Nova CLI](tutorials/nova-cli-usage.md)
 
 ### Supported api-resources
 
