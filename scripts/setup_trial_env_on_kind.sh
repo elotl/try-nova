@@ -34,7 +34,7 @@ export AGENT_IMAGE_REPO="elotl/nova-agent-trial"
 pushd "${REPO_ROOT}"/scripts
 
 # Deploy Nova control plane to kind-cp
-KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-cp" NOVA_NODE_IP=$nova_node_ip ./deploy_nova.sh kind-cp ""
+KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-cp" NOVA_NODE_IP=$nova_node_ip kubectl nova create cp kind-cp
 
 # restore old apiserver-service.yaml
 git checkout -- templates/apiserver-service.yaml
@@ -44,5 +44,5 @@ sed -i.bak "s~server: .*~$apiserver_endpoint_patch~g" ./nova-installer-output/ma
 export OVERRIDE_NOVA_AGENT_SECRET="./nova-installer-output/manifests/nova-agent-secret.yaml"
 
 # Deploy Nova agent to kind-workload-1 and kind-workload-2
-KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" ./deploy_nova.sh "" kind-workload-1
-KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" ./deploy_nova.sh "" kind-workload-2
+KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl nova create agent kind-workload-1
+KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl nova create agent kind-workload-2
