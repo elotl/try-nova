@@ -26,9 +26,9 @@ sed -i.bak 's/targetPort: 6443/& \n      nodePort: 32222/g' "${REPO_ROOT}"/scrip
 rm "${REPO_ROOT}"/scripts/templates/apiserver-service.yaml.bak
 
 
-export SCHEDULER_IMAGE_TAG="v0.5.1"
+export SCHEDULER_IMAGE_TAG="v0.6.0-rc5"
 export SCHEDULER_IMAGE_REPO="elotl/nova-scheduler-trial"
-export AGENT_IMAGE_TAG="v0.5.1"
+export AGENT_IMAGE_TAG="v0.6.0-rc5"
 export AGENT_IMAGE_REPO="elotl/nova-agent-trial"
 export APISERVER_ENDPOINT_PATCH="${nova_node_ip}:32222"
 export APISERVER_SERVICE_NODEPORT="32222"
