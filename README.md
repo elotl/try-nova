@@ -22,6 +22,7 @@ You should have:
 
 - Installed and running Docker
 - Installed [Kind](https://kind.sigs.k8s.io/)
+- Installed [novactl][tutorials/nova-cli-usage.md]
 
 ## Installation on KIND (Kubernetes in Docker) clusters
 
@@ -34,7 +35,7 @@ This script will allow you to create and configure 3 kind clusters - one of them
 Once installation finishes, you can use the following command to export Nova Control Plane kubeconfig as well as the kubeconfig of the hosting (or management) cluster and the workload clusters:
 
 ```sh
-    $ export KUBECONFIG=$PWD/scripts/nova-installer-output/nova-kubeconfig:$PWD/kubeconfig-e2e-test-cp:$PWD/kubeconfig-e2e-test-workload-1:$PWD/kubeconfig-e2e-test-workload-2
+    $ export KUBECONFIG=$HOME/.nova/kind-cp/nova-kubeconfig:$PWD/kubeconfig-e2e-test-cp:$PWD/kubeconfig-e2e-test-workload-1:$PWD/kubeconfig-e2e-test-workload-2
 ```
 
 This gives you access to Nova Control Plane (`nova` context), cluster hosting Nova Control Plane (context `kind-cp`) and two workload clusters (context `kind-workload-1` and `kind-workload-2`)
@@ -56,6 +57,7 @@ To get more insight into the cluster's available resources:
 * [Policy-based Scheduling](tutorials/poc-policy-based-scheduling.md)
 * [Capacity-based Scheduling](tutorials/poc-smart-scheduling.md)
 * [Spread Scheduling](tutorials/poc-spread-onto-multiple-clusters.md)
+* [Just In Time Clusters](tutorials/poc-standby-workload-cluster.md)
 
 ### Supported api-resources
 
