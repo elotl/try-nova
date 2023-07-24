@@ -20,6 +20,129 @@ With the "create" option (enabled via env var NOVA_CREATE_CLUSTER_IF_NEEDED), a 
 
 Note that Nova with the "create" option enabled will not choose to create a cluster to satisfy resource availability if it detects any existing accessible candidate target clusters have cluster autoscaling enabled; instead it will choose an accessible autoscaled cluster.  Nova's cluster autoscaling detection works for installations of Elotl Luna and of the Kubernetes Cluster Autoscaler.
 
+## Kind Operations
+
+Nova Just in Time Delete/Recreate Standby can be run locally on kind clusters.  In this section, we walk through a Nova JIT standby example using try-nova.
+
+Start the Nova JIT helper in a separate terminal.  This tool executes "cloud" operations on your local kind clusters, including deletion and creation.
+
+    $ ./bin/nova-jit-helper
+
+You need to enable Nova JIT at deployment time; teardown any existing deployment of the Nova trial sandbox:
+
+    $ ./scripts/teardown_kind_cluster.sh
+
+Set the following environment variables to enable standby in delete-cluster mode with enter-standby set to e.g. 90 secs:
+
+    $ export NOVA_IDLE_ENTER_STANDBY_ENABLE="true"
+    $ export NOVA_DELETE_CLUSTER_IN_STANDBY="true"
+    $ export NOVA_IDLE_ENTER_STANDBY_SECS="90"
+
+After ensuring novactl is installed from try-nova, deploy Nova:
+
+    $ ./scripts/setup_trial_env_on_kind.sh
+
+After the Nova deployment is fully initialized, you will see that both workload clusters are ready, idle, and not in standby:
+
+    $ kubectl --context=nova get clusters
+    NAME              K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE   STANDBY
+    kind-workload-1   1.25          workload-1                    True    True   False
+    kind-workload-2   1.25          workload-2                    True    True   False
+
+And you can see the kind clusters backing the nova cp and the workload clusters:
+
+    $ kind get clusters
+    cp
+    workload-1
+    workload-2
+
+After NOVA_IDLE_ENTER_STANDBY_SECS seconds have elapsed, the workload clusters enter standby, and after an additional short period are no longer reported as ready:
+
+    $ kubectl --context=nova get clusters
+    NAME              K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE   STANDBY
+    kind-workload-1   1.25          workload-1                    False   True   True
+    kind-workload-2   1.25          workload-2                    False   True   True
+
+And the kind clusters backing the workload clusters have been deleted:
+
+    $ kind get clusters
+    cp
+
+At this point, you can bring them out of standby, e.g., by scheduling spread workloads that need both workload clusters:
+
+    $ kubectl --context=nova apply -f examples/sample-spread-scheduling/busybox.yaml
+    deployment.apps/busybox created
+
+And you can see that the workload clusters are no longer idle and no longer considered to be in standby, but they are not yet ready:
+
+    $ kubectl --context=nova get clusters
+    NAME              K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE    STANDBY
+    kind-workload-1   1.25          workload-1                    False   False   False
+    kind-workload-2   1.25          workload-2                    False   False   False
+
+After the workload clusters are recreated and the nova agent software is reinstalled, they become ready:
+
+    $ kubectl --context=nova get clusters
+    NAME              K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE    STANDBY
+    kind-workload-1   1.25          workload-1                    True    False   False
+    kind-workload-2   1.25          workload-2                    True    False   False
+
+And the busybox spread workloads are successfully scheduled:
+
+    $ kubectl --context=nova get all --all-namespaces
+    NAMESPACE   NAME                        READY   STATUS    RESTARTS   AGE
+    default     pod/busybox-66f46bc-w4m6v   1/1     Running   0          89s
+    default     pod/busybox-66f46bc-zrh5p   1/1     Running   0          108s
+
+    NAMESPACE   NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+    default     service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   7m20s
+
+    NAMESPACE   NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+    default     deployment.apps/busybox   2/2     2            2           2m45s
+
+    NAMESPACE   NAME                              DESIRED   CURRENT   READY   AGE
+    default     replicaset.apps/busybox-66f46bc   1         0         0       108s
+
+You can see the kind workload clusters have been recreated:
+
+    $ kind get clusters
+    cp
+    workload-1
+    workload-2
+
+If you want to access the recreated workload clusters directly, you can generate kubeconfigs for them:
+
+    $ kind get kubeconfig --name=workload-1 >workload-1.config
+    $ kind get kubeconfig --name=workload-2 >workload-2.config
+
+And then you can check them directly:
+
+    $ KUBECONFIG=./workload-1.config kubectl get all
+    NAME                        READY   STATUS    RESTARTS   AGE
+    pod/busybox-66f46bc-zrh5p   1/1     Running   0          50m
+
+    NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+    service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   50m
+
+    NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+    deployment.apps/busybox   1/1     1            1           50m
+
+    NAME                              DESIRED   CURRENT   READY   AGE
+    replicaset.apps/busybox-66f46bc   1         1         1       50m
+
+    $ KUBECONFIG=./workload-2.config kubectl get all
+    NAME                        READY   STATUS    RESTARTS   AGE
+    pod/busybox-66f46bc-w4m6v   1/1     Running   0          49m
+
+    NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+    service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   50m
+
+    NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+    deployment.apps/busybox   1/1     1            1           49m
+
+    NAME                              DESIRED   CURRENT   READY   AGE
+    replicaset.apps/busybox-66f46bc   1         1         1       49m
+
 ## Cloud Operations
 
 ### Cloud Account Information
