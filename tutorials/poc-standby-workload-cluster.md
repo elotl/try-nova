@@ -22,23 +22,24 @@ Note that Nova with the "create" option enabled will not choose to create a clus
 
 ## Kind Operations
 
-Nova Just in Time Delete/Recreate Standby can be run locally on kind clusters.  In this section, we walk through a Nova JIT standby example using try-nova.
+Nova JIT cluster delete/recreate standby and cluster clone/create can be run locally on kind clusters.  In this section, we walk through examples of each.
 
-Start the Nova JIT helper in a separate terminal.  This tool executes "cloud" operations on your local kind clusters, including deletion and creation.
+Start the Nova JIT helper tool in a separate terminal.  This tool executes "cloud" operations on your local kind clusters, including cluster deletion and creation.
 
     $ ./bin/nova-jit-helper
 
-You need to enable Nova JIT at deployment time; teardown any existing deployment of the Nova trial sandbox:
+You need to enable Nova JIT at deployment time; teardown any existing non-JIT deployment of the Nova trial sandbox:
 
     $ ./scripts/teardown_kind_cluster.sh
 
-Set the following environment variables to enable standby in delete-cluster mode with enter-standby set to e.g. 90 secs:
+Set the following environment variables to enable standby in delete/recreate mode with enter-standby set to 90 secs and to enable cluster create/clone:
 
     $ export NOVA_IDLE_ENTER_STANDBY_ENABLE="true"
     $ export NOVA_DELETE_CLUSTER_IN_STANDBY="true"
     $ export NOVA_IDLE_ENTER_STANDBY_SECS="90"
+    $ export NOVA_CREATE_CLUSTER_IF_NEEDED="true"
 
-After ensuring novactl is installed from try-nova, deploy Nova:
+After ensuring the appropriate novactl binary from try-nova/bin is installed, deploy Nova:
 
     $ ./scripts/setup_trial_env_on_kind.sh
 
@@ -56,24 +57,24 @@ And you can see the kind clusters backing the nova cp and the workload clusters:
     workload-1
     workload-2
 
-After NOVA_IDLE_ENTER_STANDBY_SECS seconds have elapsed, the workload clusters enter standby, and after an additional short period are no longer reported as ready:
+After NOVA_IDLE_ENTER_STANDBY_SECS seconds have elapsed, the workload clusters enter standby, and after an additional short period they are no longer reported as ready:
 
     $ kubectl --context=nova get clusters
     NAME              K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE   STANDBY
     kind-workload-1   1.25          workload-1                    False   True   True
     kind-workload-2   1.25          workload-2                    False   True   True
 
-And the kind clusters backing the workload clusters have been deleted:
+And the kind clusters backing the workload clusters are deleted:
 
     $ kind get clusters
     cp
 
-At this point, you can bring them out of standby, e.g., by scheduling spread workloads that need both workload clusters:
+At this point, you can bring the clusters out of standby by, e.g., scheduling spread workloads that need both workload clusters:
 
     $ kubectl --context=nova apply -f examples/sample-spread-scheduling/busybox.yaml
     deployment.apps/busybox created
 
-And you can see that the workload clusters are no longer idle and no longer considered to be in standby, but they are not yet ready:
+You can almost immediately see that the workload clusters are no longer idle and no longer considered to be in standby, but they are not yet ready:
 
     $ kubectl --context=nova get clusters
     NAME              K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE    STANDBY
@@ -103,7 +104,7 @@ And the busybox spread workloads are successfully scheduled:
     NAMESPACE   NAME                              DESIRED   CURRENT   READY   AGE
     default     replicaset.apps/busybox-66f46bc   1         0         0       108s
 
-You can see the kind workload clusters have been recreated:
+And you can see the kind workload clusters have been recreated:
 
     $ kind get clusters
     cp
@@ -112,8 +113,8 @@ You can see the kind workload clusters have been recreated:
 
 If you want to access the recreated workload clusters directly, you can generate kubeconfigs for them:
 
-    $ kind get kubeconfig --name=workload-1 >workload-1.config
-    $ kind get kubeconfig --name=workload-2 >workload-2.config
+    $ kind get kubeconfig --name=workload-1 > workload-1.config
+    $ kind get kubeconfig --name=workload-2 > workload-2.config
 
 And then you can check them directly:
 
@@ -142,6 +143,74 @@ And then you can check them directly:
 
     NAME                              DESIRED   CURRENT   READY   AGE
     replicaset.apps/busybox-66f46bc   1         1         1       49m
+
+So we've just seen an example of Nova JIT cluster delete/recreate standby.  Next let's look at an example of Nova JIT cluster create/clone.  Nova JIT cluster create/clone creates a new cluster if needed to satisfy a Nova policy.  Such policies apply to a number of use cases, including resource availability, K8s upgrade, and resource isolation.
+
+In our example, we define a policy created to allocate a cluster to isolate a new customer's workloads.  The policy indicates that workloads matching namespace "namespace-customer3" should be placed on cluster kind-workload-3, which does not currently exist:
+
+    $ kubectl --context=nova apply -f examples/sample-policy/schedule_policy_namespace.yaml
+    schedulepolicy.policy.elotl.co/trial-policy-customer1 created
+
+We then deploy the namespace and a workload pod pod-customer3 in that namespace.
+
+    $ kubectl --context=nova apply -f examples/sample-workloads/pod_namespace.yaml
+    namespace/namespace-customer3 created
+    pod/pod-customer3 created
+
+Nova JIT begins the process of creating kind-workload-3 to accommodate the placement:
+
+    $ kubectl --context=nova get clusters
+    NAME              K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE    STANDBY
+    kind-workload-1   1.25          workload-1                    True    False   False
+    kind-workload-2   1.25          workload-2                    True    False   False
+    kind-workload-3   1.25          workload-3                    False   False   False
+
+And after the cluster is created and the Nova agent is installed on it, it becomes ready for use:
+
+    $ kubectl --context=nova get clusters
+    NAME              K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE    STANDBY
+    kind-workload-1   1.25          workload-1                    True    False   False
+    kind-workload-2   1.25          workload-2                    True    False   False
+    kind-workload-3   1.25          workload-3                    True    False   False
+
+You can see the new kind cluster that is backing the new K8s cluster:
+
+    $ kind get clusters
+    cp
+    workload-1
+    workload-2
+    workload-3
+
+And you can see the new pod running via Nova control plane:
+
+    $ kubectl --context=nova get all --all-namespaces
+    NAMESPACE             NAME                        READY   STATUS    RESTARTS   AGE
+    default               pod/busybox-66f46bc-dbbdq   1/1     Running   0          5m40s
+    default               pod/busybox-66f46bc-wztzf   1/1     Running   0          5m21s
+    namespace-customer3   pod/pod-customer3           1/1     Running   0          2m23s
+
+    NAMESPACE   NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+    default     service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   10m
+
+    NAMESPACE   NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+    default     deployment.apps/busybox   2/2     2            2           6m25s
+
+    NAMESPACE   NAME                              DESIRED   CURRENT   READY   AGE
+    default     replicaset.apps/busybox-66f46bc   1         1         0       5m41s
+
+You can generate a kubeconfig for the newly created cluster:
+
+    $ kind get kubeconfig --name=workload-3 > workload-3.config
+
+And you can use it to check the target workload cluster directly:
+
+    $ KUBECONFIG=./workload-3.config kubectl get all -n namespace-customer3
+    NAME                READY   STATUS    RESTARTS   AGE
+    pod/pod-customer3   1/1     Running   0          3m11s
+
+Note that when you get ready to teardown your kind clusters, "./scripts/teardown_kind_cluster.sh" only deletes the kind clusters that were deployed by default.  To delete the kind cluster that Nova clone/create created, run:
+
+    $ kind delete cluster --name workload-3
 
 ## Cloud Operations
 

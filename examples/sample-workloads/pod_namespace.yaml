@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: namespace-customer3
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-customer3
+  namespace: namespace-customer3
+spec:
+  containers:
+    - name: pod-customer3
+      image: busybox
+      command: ["sleep"]
+      args: ["inf"]
