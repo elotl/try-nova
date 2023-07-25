@@ -1,0 +1,17 @@
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: trial-policy-customer1
+spec:
+  namespaceSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+          - namespace-customer3
+  clusterSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: kind-workload-3
+  resourceSelectors:
+    labelSelectors:
+    - matchExpressions: []
