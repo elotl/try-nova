@@ -2,6 +2,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: namespace-customer3
+  annotations:
+     nova.elotl.co/cluster: kind-workload-3
 ---
 apiVersion: v1
 kind: Pod
