@@ -28,15 +28,20 @@ Start the Nova JIT helper tool in a separate terminal.  This tool executes "clou
 
     $ ./bin/nova-jit-helper
 
-You need to enable Nova JIT at deployment time; teardown any existing non-JIT deployment of the Nova trial sandbox:
+You need to enable Nova JIT at deployment time.  Teardown any existing non-JIT deployment of the Nova trial sandbox:
 
     $ ./scripts/teardown_kind_cluster.sh
+
+You can double-check that there are no running kind clusters:
+
+    $ kind get clusters
+    No kind clusters found.
 
 Set the following environment variables to enable standby in delete/recreate mode with enter-standby set to 90 secs and to enable cluster create/clone:
 
     $ export NOVA_IDLE_ENTER_STANDBY_ENABLE="true"
     $ export NOVA_DELETE_CLUSTER_IN_STANDBY="true"
-    $ export NOVA_IDLE_ENTER_STANDBY_SECS="90"
+    $ export NOVA_IDLE_ENTER_STANDBY_SECS="120"
     $ export NOVA_CREATE_CLUSTER_IF_NEEDED="true"
 
 After ensuring the appropriate novactl binary from try-nova/bin is installed, deploy Nova:
