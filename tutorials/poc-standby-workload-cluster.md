@@ -26,7 +26,7 @@ Nova JIT cluster delete/recreate standby and cluster clone/create can be run loc
 
 Start the Nova JIT helper tool in a separate terminal.  This tool executes "cloud" operations on your local kind clusters, including cluster deletion and creation.
 
-    $ ./bin/nova-jit-helper
+    $ ./bin/nova-jit-helper # use version for your OS and processor
 
 You need to enable Nova JIT at deployment time.  Teardown any existing non-JIT deployment of the Nova trial sandbox:
 
