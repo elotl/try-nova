@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    # this annotation tells Nova to create a copy of this namespace in each cluster
+    # you can check tutorials/poc-spread-onto-multiple-clusters.md for more details about spread scheduling.
+    nova.elotl.co/spread-onto: "kind-workload-1,kind-workload-2"
+  name: microsvc-demo
