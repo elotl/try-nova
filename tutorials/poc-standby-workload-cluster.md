@@ -24,7 +24,7 @@ Note that Nova with the "create" option enabled will not choose to create a clus
 
 Nova JIT cluster delete/recreate standby and cluster clone/create can be run locally on kind clusters.  In this section, we walk through examples of each.
 
-Start the Nova JIT helper tool in a separate terminal.  This tool executes "cloud" operations on your local kind clusters, including cluster deletion and creation.
+Start the Nova JIT helper tool in a separate terminal.  This tool executes "cloud" operations on your local kind clusters, including cluster deletion and creation.  When the tool starts up, it is in silent listening mode; it will begin printing messages to the terminal when it starts receiving requests related to Nova JIT operations.
 
     $ ./bin/nova-jit-helper # use version for your OS and processor
 
@@ -213,9 +213,10 @@ And you can use it to check the target workload cluster directly:
     NAME                READY   STATUS    RESTARTS   AGE
     pod/pod-customer3   1/1     Running   0          3m11s
 
-Note that when you get ready to teardown your kind clusters, "./scripts/teardown_kind_cluster.sh" only deletes the kind clusters that were deployed by default.  To delete the kind cluster that Nova clone/create created, run:
+At this point, you've completed the JIT examples.  Please run the following to remove your Nova control plane and workload clusters:
 
-    $ kind delete cluster --name workload-3
+    $ ./scripts/teardown_kind_cluster.sh     # removes the initially-deployed kind clusters cp, workload-1, workload-2
+    $ kind delete cluster --name workload-3  # removes the additional workload-3 kind cluster created by Nova JIT
 
 ## Cloud Operations
 
