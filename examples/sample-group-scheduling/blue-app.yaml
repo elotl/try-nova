@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/managed-by: kubernetes
     app.kubernetes.io/part-of: blue
     color: blue
+    nginxGroupScheduleDemo: "yes"
 
 ---
 
@@ -23,6 +24,7 @@ metadata:
     app.kubernetes.io/managed-by: kubernetes
     app.kubernetes.io/part-of: blue
     color: blue
+    nginxGroupScheduleDemo: "yes"
 spec:
   replicas: 1
   selector:
@@ -55,6 +57,7 @@ metadata:
     app.kubernetes.io/managed-by: kubernetes
     app.kubernetes.io/part-of: blue
     color: blue
+    nginxGroupScheduleDemo: "yes"
 spec:
   ports:
   - port: 80

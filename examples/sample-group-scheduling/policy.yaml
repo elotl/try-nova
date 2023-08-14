@@ -5,10 +5,10 @@ metadata:
 spec:
   namespaceSelector:
     matchLabels:
-      kubernetes.io/metadata.name: microsvc-demo
+      kubernetes.io/metadata.name: nginx-group-demo
   groupBy:
     labelKey: color
   resourceSelectors:
     labelSelectors:
       - matchLabels:
-          microServicesDemo: "yes"
+          nginxGroupScheduleDemo: "yes"
