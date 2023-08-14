@@ -3,7 +3,7 @@ kind: Pod
 metadata:
   annotations:
     # update it with a name of the workload cluster in Nova control plane which you want to hog
-    nova.elotl.co/cluster: kind-workload-1
+    nova.elotl.co/cluster: kind-workload-2
   labels:
     app: nginx
   namespace: default
@@ -16,5 +16,5 @@ spec:
     resources:
       requests:
         # Update cpu and memory with values that will occupy the most of your cluster resources
-        cpu: 7000m
+        cpu: 2000m
         memory: 250M
