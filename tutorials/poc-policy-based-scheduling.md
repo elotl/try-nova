@@ -41,8 +41,6 @@ You can check how your clusters are named in the Nova Control Plane:
     deployment.apps/redis-leader     1/1     1            1           83s
     ```
 
-The external-ip of the frontend service should lead you to the main page of the guestbook application.
-
 ### Workload migration
 
 Now let's say your `kind-workload-1` will go through some maintenance and you want to migrate your guestbook application to `kind-workload-2`.
