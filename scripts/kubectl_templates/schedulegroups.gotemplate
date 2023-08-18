@@ -1,6 +1,0 @@
-{{printf "%-22s%-40s%-20s" " NAME" "NOVA WORKLOAD CLUSTER" "NOVA POLICY NAME" }}
-{{printf "%-22s%-40s%-20s" "  ------------------" "--------------------------------------" "--------------------------------------" }}
-{{ range .items }}{{$assignedCluster := "Not assigned yet."}}
-{{printf "%2s%-20s" "  " .metadata.name}}{{range $k, $v := .metadata.labels}}{{if eq $k "nova.elotl.co/target-cluster"}}{{$assignedCluster = $v}}{{end}}{{end}}{{ printf "%2s%-40s" "  " $assignedCluster }}{{printf "%2s%-20s" "  " .policy.name}}
-{{end}}
-{{- printf "%-22s%-40s%-20s" "  ------------------" "--------------------------------------" "--------------------------------------" }}
