@@ -22,9 +22,17 @@ You should have:
 
 - Installed and running Docker
 - Installed [Kind](https://kind.sigs.k8s.io/)
-- Installed [novactl][tutorials/nova-cli-usage.md]
+- Installed [novactl](https://docs.elotl.co/nova/installation_novactl#install-novactl) (version >= 0.5.0)
 
 ## Installation on KIND (Kubernetes in Docker) clusters
+
+Make sure you have correct `novactl` version (>= 0.5.0) installed:
+
+```sh
+$ kubectl nova --version
+  novactl version v0.6.0 (git: 141d6e91) built: 20230801122245
+
+```
 
 This script will allow you to create and configure 3 kind clusters - one of them will be the Nova Control Plane and the other two will be Nova workload clusters.
 
@@ -44,42 +52,21 @@ To interact with the Nova control plane, use `--context=nova` flag in kubectl co
 
 ```sh
   $ kubectl --context=nova get clusters
+  NAME              K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE   STANDBY
+  kind-workload-1   1.25          workload-1                    True    True   False
+  kind-workload-2   1.25          workload-2                    True    True   False
+
 ```
 
-To get more insight into the cluster's available resources:
-```sh
-  $ kubectl --context=nova get clusters -o go-template-file=./scripts/kubectl_templates/cluster_output.gotemplate
-```
 
 ## Nova Tutorials
 
-* [Annotation-based Scheduling](tutorials/poc-annotation-based-scheduling.md)
-* [Policy-based Scheduling](tutorials/poc-policy-based-scheduling.md)
-* [Capacity-based Scheduling](tutorials/poc-smart-scheduling.md)
-* [Spread Scheduling](tutorials/poc-spread-onto-multiple-clusters.md)
-* [Just In Time Clusters](tutorials/poc-standby-workload-cluster.md)
+* [Annotation-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-annotation-based-scheduling)
+* [Policy-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-policy-based-scheduling)
+* [Capacity-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-capacity-based-scheduling)
+* [Spread Scheduling](https://docs.elotl.co/nova/Tutorials/poc-spread-onto-multiple-clusters)
+* [Just In Time Clusters](https://docs.elotl.co/nova/Tutorials/poc-standby-workload-cluster)
 
-### Supported api-resources
-
-Nova supports the following standard Kubernetes objects as well as CRDs:
-
-* configmaps
-* namespaces
-* pods
-* secrets
-* serviceaccounts
-* services
-* daemonsets
-* deployments
-* replicasets
-* statefulsets
-* ingressclasses
-* ingresses
-* networkpolicies
-* clusterrolebindings
-* clusterroles
-* rolebindings
-* roles
 
 ## Deleting Nova trial sandbox
 

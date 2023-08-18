@@ -12,7 +12,7 @@ export KUBECONFIG="./kubeconfig-e2e-test-cp"
 echo "--- creating three kind clusters: cp, workload-1, and workload-2"
 # create workload and Control plane clusters
 NOVA_K8S_VERSION=${NOVA_E2E_K8S_VERSION:-"v1.25.1"}
-CP_NOVA_K8S_VERSION=${NOVA_E2E_K8S_VERSION:-"v1.22.15"}
+CP_NOVA_K8S_VERSION=${NOVA_E2E_K8S_VERSION:-"v1.25.1"}
 readonly cp_node_image="kindest/node:${CP_NOVA_K8S_VERSION}"
 readonly node_image="kindest/node:${NOVA_K8S_VERSION}"
 if [[ $OSTYPE == 'darwin'* ]]; then
