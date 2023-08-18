@@ -21,14 +21,7 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 nova_node_ip=$(KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-cp" kubectl get nodes -o=jsonpath='{.items[0].status.addresses[0].address}' | xargs)
 echo "nova_node_ip: $nova_node_ip\n"
 
-# patch apiserver-service for integration test
-sed -i.bak 's/targetPort: 6443/& \n      nodePort: 32222/g' "${REPO_ROOT}"/scripts/templates/apiserver-service.yaml
-rm "${REPO_ROOT}"/scripts/templates/apiserver-service.yaml.bak
-
-
-export SCHEDULER_IMAGE_TAG="v0.6.0-rc7"
 export SCHEDULER_IMAGE_REPO="elotl/nova-scheduler-trial"
-export AGENT_IMAGE_TAG="v0.6.0-rc7"
 export AGENT_IMAGE_REPO="elotl/nova-agent-trial"
 export APISERVER_ENDPOINT_PATCH="${nova_node_ip}:32222"
 export APISERVER_SERVICE_NODEPORT="32222"
@@ -36,10 +29,7 @@ export APISERVER_SERVICE_NODEPORT="32222"
 pushd "${REPO_ROOT}"/scripts
 
 # Deploy Nova control plane to kind-cp
-KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-cp" NOVA_NODE_IP=$nova_node_ip kubectl nova create cp --image-repository "${SCHEDULER_IMAGE_REPO}" --image-tag "${SCHEDULER_IMAGE_TAG}" --agent-image-repository ${AGENT_IMAGE_REPO} --agent-image-tag ${AGENT_IMAGE_TAG} --context kind-cp kind-cp
-
-# restore old apiserver-service.yaml
-git checkout -- templates/apiserver-service.yaml
+KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-cp" NOVA_NODE_IP=$nova_node_ip kubectl nova create cp --image-repository "${SCHEDULER_IMAGE_REPO}"  --agent-image-repository ${AGENT_IMAGE_REPO}  --context kind-cp kind-cp
 
 KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl create ns elotl
 KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl create ns elotl
@@ -47,5 +37,5 @@ KUBECONFIG="${HOME}/.nova/kind-cp/nova-kubeconfig" kubectl get secret -n elotl n
 KUBECONFIG="${HOME}/.nova/kind-cp/nova-kubeconfig" kubectl get secret -n elotl nova-cluster-init-kubeconfig -o yaml | KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl apply -f -
 
 # Deploy Nova agent to kind-workload-1 and kind-workload-2
-KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl nova create agent --image-repository "${AGENT_IMAGE_REPO}" --image-tag "${AGENT_IMAGE_TAG}" --context kind-workload-1 kind-workload-1
-KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl nova create agent --image-repository "${AGENT_IMAGE_REPO}" --image-tag "${AGENT_IMAGE_TAG}" --context kind-workload-2 kind-workload-2
+KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl nova create agent --image-repository "${AGENT_IMAGE_REPO}" --context kind-workload-1 kind-workload-1
+KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl nova create agent --image-repository "${AGENT_IMAGE_REPO}" --context kind-workload-2 kind-workload-2
