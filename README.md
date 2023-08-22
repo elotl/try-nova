@@ -29,7 +29,7 @@ You should have:
 Make sure you have correct `novactl` version (>= 0.5.0) installed:
 
 ```sh
-$ kubectl nova --version
+  kubectl nova --version
   novactl version v0.6.0 (git: 141d6e91) built: 20230801122245
 
 ```
@@ -37,13 +37,13 @@ $ kubectl nova --version
 This script will allow you to create and configure 3 kind clusters - one of them will be the Nova Control Plane and the other two will be Nova workload clusters.
 
 ```sh
-    $ ./scripts/setup_trial_env_on_kind.sh
+    ./scripts/setup_trial_env_on_kind.sh
 ```
 
 Once installation finishes, you can use the following command to export Nova Control Plane kubeconfig as well as the kubeconfig of the hosting (or management) cluster and the workload clusters:
 
 ```sh
-    $ export KUBECONFIG=$HOME/.nova/kind-cp/nova-kubeconfig:$PWD/kubeconfig-e2e-test-cp:$PWD/kubeconfig-e2e-test-workload-1:$PWD/kubeconfig-e2e-test-workload-2
+    export KUBECONFIG=$HOME/.nova/kind-cp/nova-kubeconfig:$PWD/kubeconfig-e2e-test-cp:$PWD/kubeconfig-e2e-test-workload-1:$PWD/kubeconfig-e2e-test-workload-2
 ```
 
 This gives you access to Nova Control Plane (`nova` context), cluster hosting Nova Control Plane (context `kind-cp`) and two workload clusters (context `kind-workload-1` and `kind-workload-2`)
@@ -51,7 +51,7 @@ This gives you access to Nova Control Plane (`nova` context), cluster hosting No
 To interact with the Nova control plane, use `--context=nova` flag in kubectl commands, e.g.:
 
 ```sh
-  $ kubectl --context=nova get clusters
+  kubectl --context=nova get clusters
   NAME              K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE   STANDBY
   kind-workload-1   1.25          workload-1                    True    True   False
   kind-workload-2   1.25          workload-2                    True    True   False
@@ -70,7 +70,7 @@ To interact with the Nova control plane, use `--context=nova` flag in kubectl co
 
 ## Deleting Nova trial sandbox
 
-    $ ./scripts/teardown_kind_cluster.sh
+    ./scripts/teardown_kind_cluster.sh
 
 # Beyond KIND
 
