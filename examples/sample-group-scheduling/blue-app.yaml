@@ -39,10 +39,10 @@ spec:
     spec:
       serviceAccountName: blue-serviceaccount
       containers:
-      - name: nginx
-        image: nginx:1.7.9
-        ports:
-        - containerPort: 80
+        - name: nginx
+          image: nginx:1.7.9
+          ports:
+            - containerPort: 80
 
 ---
 
@@ -60,7 +60,7 @@ metadata:
     nginxGroupScheduleDemo: "yes"
 spec:
   ports:
-  - port: 80
+    - port: 80
   selector:
     app: nginx
     color: blue

@@ -10,11 +10,11 @@ metadata:
   name: hog-pod
 spec:
   containers:
-  - image: nginx:1.14.2
-    imagePullPolicy: IfNotPresent
-    name: nginx
-    resources:
-      requests:
-        # Update cpu and memory with values that will occupy the most of your cluster resources
-        cpu: 2000m
-        memory: 250M
+    - image: nginx:1.14.2
+      imagePullPolicy: IfNotPresent
+      name: nginx
+      resources:
+        requests:
+          # Update cpu and memory with values that will occupy the most of your cluster resources
+          cpu: 2000m
+          memory: 250M

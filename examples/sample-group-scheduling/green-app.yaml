@@ -39,15 +39,15 @@ spec:
     spec:
       serviceAccountName: green-serviceaccount
       containers:
-      - name: nginx
-        image: nginx:1.7.9
-        ports:
-        - containerPort: 80
-        resources:
-          requests:
-          # Update cpu and memory with values that will occupy the most of your cluster resources
-            cpu: 500m
-            memory: 250M
+        - name: nginx
+          image: nginx:1.7.9
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              # Update cpu and memory with values that will occupy the most of your cluster resources
+              cpu: 500m
+              memory: 250M
 
 ---
 
@@ -65,7 +65,7 @@ metadata:
     nginxGroupScheduleDemo: "yes"
 spec:
   ports:
-  - port: 80
+    - port: 80
   selector:
     app: nginx
     color: green
