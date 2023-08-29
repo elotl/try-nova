@@ -58,6 +58,11 @@ To interact with the Nova control plane, use `--context=nova` flag in kubectl co
 
 ```
 
+If you want to run multiple Nova Control Planes you probably will also want to rename your context:
+
+```sh
+  kubectl config rename-context nova <your custom name>
+```
 
 ## Nova Tutorials
 
