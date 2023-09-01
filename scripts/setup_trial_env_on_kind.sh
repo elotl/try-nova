@@ -29,7 +29,7 @@ export APISERVER_SERVICE_NODEPORT="32222"
 pushd "${REPO_ROOT}"/scripts
 
 # Deploy Nova control plane to kind-cp
-KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-cp" NOVA_NODE_IP=$nova_node_ip kubectl nova create cp --image-repository "${SCHEDULER_IMAGE_REPO}"  --agent-image-repository ${AGENT_IMAGE_REPO}  --context kind-cp kind-cp
+KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-cp" NOVA_NODE_IP=$nova_node_ip kubectl nova create cp --image-repository "${SCHEDULER_IMAGE_REPO}" --context kind-cp kind-cp
 
 KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl create ns elotl
 KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl create ns elotl
