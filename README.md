@@ -22,7 +22,7 @@ You should have:
 
 - Installed and running Docker
 - Installed [Kind](https://kind.sigs.k8s.io/)
-- Downloaded and Installed [novactl](https://docs.elotl.co/nova/installation_novactl#download-novactl) (version >= 0.5.0)
+- Installed [novactl](https://docs.elotl.co/nova/installation_novactl#install-novactl) (version >= 0.5.0)
 
 ## Installation on KIND (Kubernetes in Docker) clusters
 
