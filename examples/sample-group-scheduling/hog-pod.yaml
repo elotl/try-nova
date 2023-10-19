@@ -10,9 +10,11 @@ metadata:
   name: hog-pod
 spec:
   containers:
-    - image: nginx:1.14.2
+    - image: busybox
       imagePullPolicy: IfNotPresent
-      name: nginx
+      name: busybox
+      command: [ "sleep" ]
+      args: [ "inf" ]
       resources:
         requests:
           # Update cpu and memory with values that will occupy the most of your cluster resources
