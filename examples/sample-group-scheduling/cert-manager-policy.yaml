@@ -1,0 +1,26 @@
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: cert-manager-policy
+spec:
+  namespaceSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+          - cert-manager # we will match objects from cert-manager namespace + cluster scoped objects
+  groupBy:
+    labelKey: app.kubernetes.io/version # we want to group objects by version label
+  spreadConstraints:
+    topologyKey: kubernetes.io/metadata.name # this refers to the Cluster CR labels. Setting it to kubernetes.io/metadata.name ensures that each selected cluster gets one copy, because value of kubernetes.io/metadata.name label is unique for each cluster.
+  clusterSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+          - kind-workload-1 # replace those two with your workload clusters name
+          - kind-workload-2 # you can check these by running kubectl --context=nova get clusters
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          app.kubernetes.io/instance: 'cert-manager'
