@@ -1,0 +1,41 @@
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: spread-namespace-policy
+spec:
+  namespaceSelector: {}
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          release: istio
+  groupBy:
+    labelKey: release
+  clusterSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+          - kind-workload-1 # change it to your workload cluster name
+          - kind-workload-2 # change it to your workload cluster name
+  spreadConstraints:
+    spreadMode: Duplicate
+    topologyKey: kubernetes.io/metadata.name
+    overrides:
+      - topologyValue: kind-workload-1 # change it to your workload cluster name
+        resources:
+          - kind: Namespace
+            apiVersion: v1
+            name: istio-system
+            override:
+              - fieldPath: metadata.labels['topology.istio.io/network']
+                value:
+                  staticValue: west-network
+      - topologyValue: kind-workload-2 # change it to your workload cluster name
+        resources:
+          - kind: Namespace
+            apiVersion: v1
+            name: istio-system
+            override:
+              - fieldPath: metadata.labels['topology.istio.io/network']
+                value:
+                  staticValue: central-network
