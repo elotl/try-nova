@@ -29,13 +29,13 @@ export APISERVER_SERVICE_NODEPORT="32222"
 pushd "${REPO_ROOT}"/scripts
 
 # Deploy Nova control plane to kind-cp
-KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-cp" NOVA_NODE_IP=$nova_node_ip kubectl nova install cp --image-repository "${SCHEDULER_IMAGE_REPO}" --context kind-cp nova
+KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-cp" NOVA_NODE_IP=$nova_node_ip kubectl nova create cp --image-repository "${SCHEDULER_IMAGE_REPO}" --context kind-cp nova
 
 KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl create ns elotl
 KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl create ns elotl
-KUBECONFIG="${HOME}/.nova/nova/nova-kubeconfig" kubectl get secret -n elotl nova-cluster-init-kubeconfig -o yaml | KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl apply -f -
-KUBECONFIG="${HOME}/.nova/nova/nova-kubeconfig" kubectl get secret -n elotl nova-cluster-init-kubeconfig -o yaml | KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl apply -f -
+KUBECONFIG="${HOME}/.nova/kind-cp/nova-kubeconfig" kubectl get secret -n elotl nova-cluster-init-kubeconfig -o yaml | KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl apply -f -
+KUBECONFIG="${HOME}/.nova/kind-cp/nova-kubeconfig" kubectl get secret -n elotl nova-cluster-init-kubeconfig -o yaml | KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl apply -f -
 
 # Deploy Nova agent to kind-workload-1 and kind-workload-2
-KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl nova install agent --image-repository "${AGENT_IMAGE_REPO}" --context kind-workload-1 kind-workload-1
-KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl nova install agent --image-repository "${AGENT_IMAGE_REPO}" --context kind-workload-2 kind-workload-2
+KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl nova create agent --image-repository "${AGENT_IMAGE_REPO}" --context kind-workload-1 kind-workload-1
+KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl nova create agent --image-repository "${AGENT_IMAGE_REPO}" --context kind-workload-2 kind-workload-2
