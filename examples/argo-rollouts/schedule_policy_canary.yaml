@@ -1,0 +1,31 @@
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: rollouts-demo-policy
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: default
+  clusterSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+          - kind-workload-1
+          - kind-workload-2
+  spreadConstraints:
+    topologyKey: kubernetes.io/metadata.name
+    spreadMode: Divide
+  resourceSelectors:
+    labelSelectors:
+      - matchExpressions:
+          - key: app
+            operator: In
+            values:
+              - rollouts-demo
+          - key: role
+            operator: Exists
+          - key: base-template
+            operator: DoesNotExist
+  groupBy:
+    labelKey: role

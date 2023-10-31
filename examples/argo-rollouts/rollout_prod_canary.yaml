@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollout-demo
+spec:
+  replicas: 10
+  revisionHistoryLimit: 1
+  workloadRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: rollouts-demo
+  strategy:
+    canary:
+      canaryMetadata:
+        labels:
+          role: canary
+      stableMetadata:
+        labels:
+          role: stable
+      canaryService: rollouts-demo-canary
+      steps:
+        - setWeight: 20
+        - pause: {}
+        - analysis:
+            templates:
+              - templateName: http-benchmark
+            args:
+              - name: host
+                value: rollouts-demo-canary
+        - setWeight: 60
+        - pause: {}

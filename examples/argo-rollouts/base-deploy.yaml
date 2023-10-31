@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rollouts-demo
+  namespace: default
+  labels:
+    base-template: "yes"
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: rollouts-demo
+  template:
+    metadata:
+      labels:
+        app: rollouts-demo
+        role: placeholder
+    spec:
+      containers:
+        - name: main
+          image: argoproj/rollouts-demo:green
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 5m
