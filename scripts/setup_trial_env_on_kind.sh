@@ -33,8 +33,8 @@ KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-cp" NOVA_NODE_IP=$nova_node_ip kube
 
 KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl create ns elotl
 KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl create ns elotl
-KUBECONFIG="${HOME}/.nova/kind-cp/nova-kubeconfig" kubectl get secret -n elotl nova-cluster-init-kubeconfig -o yaml | KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl apply -f -
-KUBECONFIG="${HOME}/.nova/kind-cp/nova-kubeconfig" kubectl get secret -n elotl nova-cluster-init-kubeconfig -o yaml | KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl apply -f -
+KUBECONFIG="${HOME}/.nova/nova/nova-kubeconfig" kubectl get secret -n elotl nova-cluster-init-kubeconfig -o yaml | KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl apply -f -
+KUBECONFIG="${HOME}/.nova/nova/nova-kubeconfig" kubectl get secret -n elotl nova-cluster-init-kubeconfig -o yaml | KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl apply -f -
 
 # Deploy Nova agent to kind-workload-1 and kind-workload-2
 KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl nova create agent --image-repository "${AGENT_IMAGE_REPO}" --context kind-workload-1 kind-workload-1
