@@ -18,4 +18,4 @@ KUBECONFIG="$1" kubectl -n metallb-system wait pod --all --timeout=90s --for=con
 KUBECONFIG="$1" kubectl -n metallb-system wait deploy controller --timeout=90s --for=condition=Available
 KUBECONFIG="$1" kubectl -n metallb-system wait apiservice v1beta1.metallb.io --timeout=90s --for=condition=Available
 KUBECONFIG="$1" kubectl apply -f ./metal_lb_addrpool.yaml
-rm ./metal_lb_addrpool.yaml
+rm ./metal_lb_addrpool.yaml || true
