@@ -33,6 +33,13 @@ KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-cp" NOVA_NODE_IP=$nova_node_ip kube
 
 KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl create ns elotl
 KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl create ns elotl
+
+
+while ! KUBECONFIG="${HOME}/.nova/nova/nova-kubeconfig"  kubectl get secret nova-cluster-init-kubeconfig --namespace elotl;
+do
+  echo "Waiting for nova-cluster-init-kubeconfig secret creation"; sleep 5;
+done
+
 KUBECONFIG="${HOME}/.nova/nova/nova-kubeconfig" kubectl get secret -n elotl nova-cluster-init-kubeconfig -o yaml | KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-1" kubectl apply -f -
 KUBECONFIG="${HOME}/.nova/nova/nova-kubeconfig" kubectl get secret -n elotl nova-cluster-init-kubeconfig -o yaml | KUBECONFIG="${REPO_ROOT}/kubeconfig-e2e-test-workload-2" kubectl apply -f -
 
