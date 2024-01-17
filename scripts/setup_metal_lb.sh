@@ -14,8 +14,8 @@ export RANGE_END=$(echo  $foo"255.255")
 envsubst < "${REPO_ROOT}/scripts/metal_lb_addrpool_template.yaml" > "./metal_lb_addrpool.yaml"
 echo "--- Metal LB config:"
 cat ./metal_lb_addrpool.yaml
-KUBECONFIG="$1" kubectl -n metallb-system wait pod --all --timeout=90s --for=condition=Ready
-KUBECONFIG="$1" kubectl -n metallb-system wait deploy controller --timeout=90s --for=condition=Available
-KUBECONFIG="$1" kubectl -n metallb-system wait apiservice v1beta1.metallb.io --timeout=90s --for=condition=Available
+KUBECONFIG="$1" kubectl -n metallb-system wait pod --all --timeout=1200s --for=condition=Ready
+KUBECONFIG="$1" kubectl -n metallb-system wait deploy controller --timeout=1200s --for=condition=Available
+KUBECONFIG="$1" kubectl -n metallb-system wait apiservice v1beta1.metallb.io --timeout=1200s --for=condition=Available
 KUBECONFIG="$1" kubectl apply -f ./metal_lb_addrpool.yaml
 rm ./metal_lb_addrpool.yaml || true

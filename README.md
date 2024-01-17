@@ -20,17 +20,69 @@ We love feedback, so please feel free to ask questions by creating an issue in t
 
 You should have:
 
-- Installed and running Docker
+- Installed and running [Docker](https://docs.docker.com/engine/install/)
 - Installed [Kind](https://kind.sigs.k8s.io/)
-- Installed [novactl](https://docs.elotl.co/nova/installation_novactl#install-novactl) (version >= 0.5.0)
+- Installed [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
 
-## Installation on KIND (Kubernetes in Docker) clusters
+Please note that Nova on KIND is tested on:
+1. Mac OS Version 13.2
+2. Ubuntu Version 22.04.1
+Most other environments with the above pre-reqs should work.
 
-Make sure you have correct `novactl` version (>= 0.5.0) installed:
+In some Linux environments, the default [inotify](https://linux.die.net/man/7/inotify) resource configuration might not allow you to create sufficient Kind clusters to successfully install Nova. View more about why this is needed [here](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files)
+
+To increase these inotify limits, edit the file `/etc/sysctl.conf` and add these lines:
+```bash
+fs.inotify.max_user_watches = 524288
+fs.inotify.max_user_instances = 512
+```
+
+## Install Nova's command line tool `novactl`
+
+`novactl` is our CLI that allows you to easily create new Nova Control Planes, register new Nova Workload Clusters, check the health of your Nova cluster, and more!
+
+### Download `novactl`
+
+```bash
+curl -s https://api.github.com/repos/elotl/novactl/releases/latest | \
+jq -r '.assets[].browser_download_url' | \
+grep "$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m | sed 's/x86_64/amd64/;s/i386/386/;s/aarch64/arm64/')" | \
+xargs -I {} curl -L {} -o novactl
+```
+
+### Install `novactl`
+
+#### Make the binary executable
+
+Once you have the binary, run:
+
+```bash
+chmod +x novactl*
+```
+
+#### Place the binary in your PATH
+
+This step depends on your local setup, but most likely you simply want to run:
+
+```bash
+sudo mv novactl* /usr/local/bin/novactl
+```
+
+#### Install it as kubectl plugin
+
+`novactl` is ready to work as a [kubectl plugin](https://kubernetes.io/docs/tasks/extend-kubectl/kubectl-plugins/). **Our docs assume you're using `novactl` as kubectl plugin**. To make this work, simply run:
+
+```bash
+sudo novactl kubectl-install
+```
+
+## Installation of Nova on KIND (Kubernetes in Docker) clusters
+
+Make sure you have the correct `novactl` version (= 0.7.1) installed:
 
 ```sh
   kubectl nova --version
-  novactl version v0.6.0 (git: 141d6e91) built: 20230801122245
+  novactl version v0.7.1 (git: a97586b5) built: 20231103080341
 
 ```
 
