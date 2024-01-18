@@ -1,0 +1,51 @@
+apiVersion: recovery.elotl.co/v1alpha1
+kind: RecoveryPlan
+metadata:
+  name: psql-primary-failover-plan
+spec:
+  alertLabels:
+    app: example-app
+  steps:
+    - type: patch
+      patch:
+        apiVersion: "pg.percona.com/v2beta1"
+        resource: "perconapgclusters"
+        namespace: "psql-operator"
+        name: "cluster1"
+        override:
+          fieldPath: "spec.standby.enabled"
+          value:
+            raw: true
+        patchType: "application/merge-patch+json"
+    - type: patch
+      patch:
+        apiVersion: "pg.percona.com/v2beta1"
+        resource: "perconapgclusters"
+        namespace: "psql-operator"
+        name: "cluster2"
+        override:
+          fieldPath: "spec.standby.enabled"
+          value:
+            raw: false
+        patchType: "application/merge-patch+json"
+    - type: readField
+      readField:
+        apiVersion: "pg.percona.com/v2beta1"
+        resource: "perconapgclusters"
+        namespace: "psql-operator"
+        name: "cluster2"
+        fieldPath: "status.host"
+        outputKey: "Cluster2IP"
+    - patch:
+        apiVersion: "v1"
+        resource: "configmaps"
+        namespace: "psql-operator"
+        name: "haproxy-config"
+        override:
+          fieldPath: "data"
+          value:
+            raw: {"haproxy.cfg": "defaults\n    mode tcp\n    timeout connect 5000ms\n    timeout client 50000ms\n    timeout server 50000ms\n\nfrontend fe_main\n    bind *:5432\n    default_backend be_db_2\n\nbackend be_db_2\n    server db2 {{ .Values.Cluster2IP }}:5432 check"}
+
+        patchType: "application/merge-patch+json"
+
+      type: patch

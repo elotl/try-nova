@@ -1,0 +1,72 @@
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: psql-all-clusters
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: psql-operator
+  groupBy:
+    labelKey: psql-cluster
+  clusterSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+          - kind-workload-1
+          - kind-workload-2
+  spreadConstraints:
+    spreadMode: Duplicate
+    topologyKey: kubernetes.io/metadata.name
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          psql-cluster: all
+---
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: psql-cluster-1
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: psql-operator
+  clusterSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: kind-workload-1
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          psql-cluster: cluster-1
+---
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: psql-cluster-2
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: psql-operator
+  clusterSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: kind-workload-2
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          psql-cluster: cluster-2
+---
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: psql-cluster-3
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: psql-operator
+  clusterSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: cluster-3
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          psql-cluster: cluster-3
