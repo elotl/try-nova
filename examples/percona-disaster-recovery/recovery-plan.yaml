@@ -39,7 +39,7 @@ spec:
     - patch:
         apiVersion: "v1"
         resource: "configmaps"
-        namespace: "psql-operator"
+        namespace: "default"
         name: "haproxy-config"
         override:
           fieldPath: "data"
