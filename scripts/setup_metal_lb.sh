@@ -7,6 +7,10 @@ KUBECONFIG="$1" kubectl patch -n metallb-system deploy controller --type='json' 
 
 # subnet for kind bridge: https://kind.sigs.k8s.io/docs/user/loadbalancer/
 gateway=$(docker network inspect -f '{{json (index .IPAM.Config 0).Gateway}}' kind | xargs)
+if [ -z "$gateway" ]; then
+    # If the gateway is empty, try with index 1
+    gateway=$(docker network inspect -f '{{json (index .IPAM.Config 1).Gateway}}' kind | xargs)
+fi
 suffix="0.1"
 foo=${gateway%"$suffix"}
 export RANGE_START=$(echo $foo"255.200")
