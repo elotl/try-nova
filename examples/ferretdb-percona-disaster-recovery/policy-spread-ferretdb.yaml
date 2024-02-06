@@ -1,0 +1,78 @@
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: spread-ferretdb
+spec:
+  namespaceSelector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name
+      operator: Exists
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          app: ferretdb
+  groupBy:
+    labelKey: app
+  clusterSelector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name # TODO: do it by labels instead of cluster name
+      operator: In
+      values:
+      - kind-workload-1
+      - kind-workload-2
+  spreadConstraints:
+    spreadMode: Duplicate
+    topologyKey: kubernetes.io/metadata.name
+    overrides:
+      - topologyValue: kind-workload-1
+        resources:
+          - kind: Deployment
+            apiVersion: apps/v1
+            name: ferretdb
+            namespace: default
+            override:
+              - fieldPath: spec.template.spec.containers[0].env[0].value
+                value:
+                  staticValue: postgres://cluster1-ha.psql-operator.svc:5432/zoo
+      - topologyValue: kind-workload-2
+        resources:
+          - kind: Deployment
+            apiVersion: apps/v1
+            name: ferretdb
+            namespace: default
+            override:
+              - fieldPath: spec.template.spec.containers[0].env[0].value
+                value:
+                  staticValue: postgres://cluster2-ha.psql-operator.svc:5432/zoo
+---
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: psql-cluster-1-ferretdb
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: default
+  clusterSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: kind-workload-1
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          psql-cluster: cluster-1
+---
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: psql-cluster-2-ferretdb
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: default
+  clusterSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: kind-workload-2
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          psql-cluster: cluster-2

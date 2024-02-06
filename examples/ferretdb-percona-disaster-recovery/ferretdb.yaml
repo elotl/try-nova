@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ferretdb
+  namespace: default
+  labels:
+    app: ferretdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ferretdb
+  template:
+    metadata:
+      labels:
+        app: ferretdb
+    spec:
+      containers:
+        - name: ferretdb
+          image: ghcr.io/ferretdb/ferretdb
+          ports:
+            - containerPort: 27017
+          env:
+            - name: FERRETDB_POSTGRESQL_URL
+              value: postgres://cluster1-pgbouncer.psql-operator.svc:5432/zoo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ferretdb-service-1
+  namespace: default
+  labels:
+    psql-cluster: cluster-1
+spec:
+  type: LoadBalancer
+  selector:
+    app: ferretdb
+  ports:
+    - name: mongo
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ferretdb-service-2
+  namespace: default
+  labels:
+    psql-cluster: cluster-2
+spec:
+  type: LoadBalancer
+  selector:
+    app: ferretdb
+  ports:
+    - name: mongo
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
