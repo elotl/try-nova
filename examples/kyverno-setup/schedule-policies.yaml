@@ -1,0 +1,92 @@
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: kyverno-all-clusters
+spec:
+  namespaceSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: kyverno
+  groupBy:
+    labelKey: app.kubernetes.io/part-of
+  clusterSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+          - kind-workload-1
+          - kind-workload-2
+  spreadConstraints:
+    spreadMode: Duplicate
+    topologyKey: kubernetes.io/metadata.name
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          app.kubernetes.io/part-of: kyverno
+---
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: kyverno-policies-all-clusters
+spec:
+  namespaceSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: kyverno-policy
+  groupBy:
+    labelKey: app.kubernetes.io/part-of
+  clusterSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+          - kind-workload-1
+          - kind-workload-2
+  spreadConstraints:
+    spreadMode: Duplicate
+    topologyKey: kubernetes.io/metadata.name
+    overrides:
+      - topologyValue: kind-workload-1
+        resources:
+          - kind: ClusterPolicy
+            apiVersion: kyverno.io/v1
+            name: require-labels
+            override:
+              - fieldPath: spec.validationFailureAction
+                value:
+                  staticValue: enforce
+          - kind: ClusterPolicy
+            apiVersion: kyverno.io/v2beta1
+            name: require-labels
+            override:
+              - fieldPath: spec.validationFailureAction
+                value:
+                  staticValue: enforce
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          app.kubernetes.io/part-of: kyverno-policy
+---
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: kyverno-test-all-clusters
+spec:
+  namespaceSelector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name
+      operator: Exists
+  groupBy:
+    labelKey: app.kubernetes.io/part-of
+  clusterSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+          - kind-workload-1
+          - kind-workload-2
+  spreadConstraints:
+    spreadMode: Duplicate
+    topologyKey: kubernetes.io/metadata.name
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          app.kubernetes.io/part-of: kyverno-test
