@@ -20,9 +20,9 @@ We love feedback, so please feel free to ask questions by creating an issue in t
 
 You should have:
 
-- Installed and running [Docker](https://docs.docker.com/engine/install/)
-- Installed [Kind](https://kind.sigs.k8s.io/)
-- Installed [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
+- Installed and running [Docker](https://docs.docker.com/engine/install/) (tested on version `24.0.2`)
+- Installed [Kind](https://kind.sigs.k8s.io/) (tested on version `0.18.0`)
+- Installed [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) (tested on version `v1.26.2`)
 
 Please note that Nova on KIND is tested on:
 1. Mac OS Version 13.2
