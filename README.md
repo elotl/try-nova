@@ -23,11 +23,11 @@ You should have:
 - Installed and running [Docker](https://docs.docker.com/engine/install/) (tested on version `24.0.2`)
 - Installed [Kind](https://kind.sigs.k8s.io/) (tested on version `0.18.0`)
 - Installed [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) (tested on version `v1.26.2`)
+- Installed [jq](https://jqlang.github.io/jq/download/) (tested on version `1.7`)
 
 Please note that Nova on KIND is tested on:
 1. Mac OS Version 13.2
 2. Ubuntu Version 22.04.1
-Most other environments with the above pre-reqs should work.
 
 In some Linux environments, the default [inotify](https://linux.die.net/man/7/inotify) resource configuration might not allow you to create sufficient Kind clusters to successfully install Nova. View more about why this is needed [here](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files)
 
@@ -36,6 +36,16 @@ To increase these inotify limits, edit the file `/etc/sysctl.conf` and add these
 fs.inotify.max_user_watches = 524288
 fs.inotify.max_user_instances = 512
 ```
+Use the following command to load the new sysctl settings:
+```bash
+sudo sysctl -p
+```
+Ensure these variables have been set correctly by using these commands:
+```bash
+sysctl -n fs.inotify.max_user_watches
+sysctl -n fs.inotify.max_user_instances
+```
+
 
 ## Install Nova's command line tool `novactl`
 
