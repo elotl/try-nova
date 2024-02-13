@@ -72,7 +72,7 @@ create_workload_namespaces() {
 
 # Function to wait for and apply the nova-cluster-init-kubeconfig secret to workload clusters
 wait_and_apply_nova_cluster_init() {
-    while ! KUBECONFIG="${HOME}/.nova/nova/nova-kubeconfig" kubectl get secret nova-cluster-init-kubeconfig --namespace elotl; do
+    while ! KUBECONFIG="${HOME}/.nova/nova/nova-kubeconfig" kubectl get secret nova-cluster-init-kubeconfig --namespace elotl &>/dev/null; do
         echo "Waiting for nova-cluster-init-kubeconfig secret creation"
         sleep 5
     done
