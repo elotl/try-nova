@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 cp_cluster="cp"
 workload_cluster_1="workload-1"
@@ -19,7 +19,7 @@ create_kind_cluster() {
     local cluster_name=$1
     local kubeconfig_path=$2
     local image=$3 # Renamed to avoid conflict with readonly variables
-    local extra_port_mappings=$4
+    local extra_port_mappings=${4:-}
 
     touch "$kubeconfig_path"
     export KUBECONFIG="$kubeconfig_path"

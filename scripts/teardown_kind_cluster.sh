@@ -1,6 +1,6 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 cp_cluster="cp"
 workload_cluster_1="workload-1"

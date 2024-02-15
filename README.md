@@ -21,9 +21,10 @@ We love feedback, so please feel free to ask questions by creating an issue in t
 You should have:
 
 - Installed and running [Docker](https://docs.docker.com/engine/install/) (tested on version `24.0.2`)
-- Installed [Kind](https://kind.sigs.k8s.io/) (tested on version `0.18.0`)
+- Installed [Kind](https://kind.sigs.k8s.io/docs/user/quick-start) (tested on version `0.18.0`)
 - Installed [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) (tested on version `v1.26.2`)
 - Installed [jq](https://jqlang.github.io/jq/download/) (tested on version `1.7`)
+- Installed [envsubst](https://github.com/a8m/envsubst) (tested on version `0.22.4`)
 
 Please note that Nova on KIND is tested on:
 1. Mac OS Version 13.2
@@ -67,15 +68,15 @@ xargs -I {} curl -L {} -o novactl
 Once you have the binary, run:
 
 ```bash
-chmod +x novactl*
+chmod +x novactl
 ```
 
 #### Place the binary in your PATH
 
-This step depends on your local setup, but most likely you simply want to run:
+The following is an example to install the plugin in `/usr/local/bin` for Unix-like operating systems:
 
 ```bash
-sudo mv novactl* /usr/local/bin/novactl
+sudo mv novactl /usr/local/bin/novactl
 ```
 
 #### Install it as kubectl plugin
@@ -95,6 +96,8 @@ Make sure you have the correct `novactl` version (= 0.7.1) installed:
   novactl version v0.7.1 (git: a97586b5) built: 20231103080341
 
 ```
+
+Navigate to the root of the repository.
 
 This script will allow you to create and configure 3 kind clusters - one of them will be the Nova Control Plane and the other two will be Nova workload clusters.
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Validate script arguments
 if [[ $# -ne 3 ]]; then
@@ -6,9 +6,9 @@ if [[ $# -ne 3 ]]; then
     exit 1
 fi
 
-kubeconfig_path="$1"; shift
-range_start_suffix="$1"; shift
-range_end_suffix="$1"; shift
+kubeconfig_path="$1"
+range_start_suffix="$2"
+range_end_suffix="$3"
 
 echo "called with kubeconfig_path: ${kubeconfig_path} range_start: ${range_start_suffix} range_end: ${range_end_suffix}"
 

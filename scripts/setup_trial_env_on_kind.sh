@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # Ensure required tools are installed
-for tool in kubectl kind jq; do
+for tool in kubectl kind jq envsubst; do
     if ! command -v "$tool" &> /dev/null; then
         echo "Error: Required tool ${tool} is not installed."
         exit 1
@@ -85,7 +85,7 @@ wait_and_apply_nova_cluster_init() {
 
 # Check if clusters already exist
 if [ "$(clusters_exist)" = false ]; then
-    "${SCRIPT_DIR}/setup_kind_cluster.sh"
+    source "${SCRIPT_DIR}/setup_kind_cluster.sh"
 else
     echo "Clusters already exist, skipping kind cluster creation and MetalLB setup."
 fi
