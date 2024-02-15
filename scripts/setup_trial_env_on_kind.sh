@@ -11,7 +11,7 @@ for tool in kubectl kind jq; do
 done
 
 export KUBECONFIG=./kubeconfig-e2e-test
-REPO_ROOT=$(git rev-parse --show-toplevel)
+REPO_ROOT=$(pwd)
 
 # Determine the directory of the current script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
@@ -86,11 +86,6 @@ wait_and_apply_nova_cluster_init() {
 # Check if clusters already exist
 if [ "$(clusters_exist)" = false ]; then
     "${SCRIPT_DIR}/setup_kind_cluster.sh"
-    # Setup MetalLB only if clusters were just created
-    source "${SCRIPT_DIR}/setup_metal_lb.sh" "$kubeconfig_cp" "200" "210"
-    source "${SCRIPT_DIR}/setup_metal_lb.sh" "$kubeconfig_workload_1" "211" "230"
-    source "${SCRIPT_DIR}/setup_metal_lb.sh" "$kubeconfig_workload_2" "231" "255"
-    echo "--- Metal Load Balancer installed in all clusters."
 else
     echo "Clusters already exist, skipping kind cluster creation and MetalLB setup."
 fi
