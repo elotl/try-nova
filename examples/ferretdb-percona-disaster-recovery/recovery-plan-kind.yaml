@@ -8,24 +8,24 @@ spec:
   steps:
     - type: patch
       patch:
-        apiVersion: "pg.percona.com/v2beta1"
+        apiVersion: "pgv2.percona.com/v2"
         resource: "perconapgclusters"
         namespace: "psql-operator"
         name: "cluster1"
         override:
           fieldPath: "spec.standby.enabled"
-          value: 
+          value:
             raw: true
         patchType: "application/merge-patch+json"
     - type: patch
       patch:
-        apiVersion: "pg.percona.com/v2beta1"
+        apiVersion: "pgv2.percona.com/v2"
         resource: "perconapgclusters"
         namespace: "psql-operator"
         name: "cluster2"
         override:
           fieldPath: "spec.standby.enabled"
-          value: 
+          value:
             raw: false
         patchType: "application/merge-patch+json"
     - type: readField # kubectl get service/ferretdb-service-2 -n default --context percona-2 -o=jsonpath='{.spec.clusterIP}'

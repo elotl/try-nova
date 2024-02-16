@@ -1,4 +1,4 @@
-apiVersion: pg.percona.com/v2beta1
+apiVersion: pgv2.percona.com/v2
 kind: PerconaPGCluster
 metadata:
   name: cluster1
@@ -74,3 +74,17 @@ spec:
 #    imagePullPolicy: IfNotPresent
     secret: cluster1-pmm-secret
     serverHost: monitoring-service
+
+  extensions:
+    image: percona/percona-postgresql-operator:2.3.0
+    imagePullPolicy: Always
+    storage:
+      type: s3
+      bucket: "nova-postgresql-backup"
+      endpoint: "http://172.18.255.240:9000"
+      region: "eu-west-3"
+      secret:
+        name: ext-secret
+    custom:
+    - name: pgvector
+      version: 0.5.1
