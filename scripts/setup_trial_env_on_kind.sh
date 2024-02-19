@@ -10,16 +10,16 @@ for tool in kubectl kind jq envsubst; do
     fi
 done
 
-export KUBECONFIG=./kubeconfig-e2e-test
+export KUBECONFIG=./kubeconfig-try-nova
 REPO_ROOT=$(pwd)
 
 # Determine the directory of the current script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
 # Define kubeconfig paths
-kubeconfig_cp="${REPO_ROOT}/kubeconfig-e2e-test-cp"
-kubeconfig_workload_1="${REPO_ROOT}/kubeconfig-e2e-test-workload-1"
-kubeconfig_workload_2="${REPO_ROOT}/kubeconfig-e2e-test-workload-2"
+kubeconfig_cp="${REPO_ROOT}/kubeconfig-cp"
+kubeconfig_workload_1="${REPO_ROOT}/kubeconfig-workload-1"
+kubeconfig_workload_2="${REPO_ROOT}/kubeconfig-workload-2"
 
 # Set image repositories with defaults or use the provided values
 SCHEDULER_IMAGE_REPO=${SCHEDULER_IMAGE_REPO:-"elotl/nova-scheduler-trial"}
@@ -58,7 +58,7 @@ deploy_nova_agents() {
         if [[ -n "${IMAGE_TAG:-}" ]]; then
             image_tag_option="--image-tag ${IMAGE_TAG}"
         fi
-        context=$(basename "$kubeconfig" | sed 's/kubeconfig-e2e-test-//')
+        context=$(basename "$kubeconfig" | sed 's/kubeconfig-//')
         KUBECONFIG="$kubeconfig" kubectl nova install agent --image-repository "${AGENT_IMAGE_REPO}" ${image_tag_option} --context kind-"${context}" kind-"${context}"
     done
 }
@@ -85,7 +85,7 @@ wait_and_apply_nova_cluster_init() {
 
 # Check if clusters already exist
 if [ "$(clusters_exist)" = false ]; then
-    source "${SCRIPT_DIR}/setup_kind_cluster.sh"
+    source "${SCRIPT_DIR}/setup_kind_cluster.sh.inc"
 else
     echo "Clusters already exist, skipping kind cluster creation and MetalLB setup."
 fi
