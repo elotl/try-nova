@@ -10,7 +10,7 @@ for tool in kubectl kind jq envsubst; do
     fi
 done
 
-export KUBECONFIG=./kubeconfig-try-nova
+export KUBECONFIG=./kubeconfig
 REPO_ROOT=$(pwd)
 
 # Determine the directory of the current script
