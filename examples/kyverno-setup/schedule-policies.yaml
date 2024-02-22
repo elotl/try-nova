@@ -13,8 +13,8 @@ spec:
       - key: kubernetes.io/metadata.name
         operator: In
         values:
-          - kind-workload-1
-          - kind-workload-2
+          - ${NOVA_WORKLOAD_CLUSTER_1}
+          - ${NOVA_WORKLOAD_CLUSTER_2}
   spreadConstraints:
     spreadMode: Duplicate
     topologyKey: kubernetes.io/metadata.name
@@ -38,13 +38,13 @@ spec:
       - key: kubernetes.io/metadata.name
         operator: In
         values:
-          - kind-workload-1
-          - kind-workload-2
+          - ${NOVA_WORKLOAD_CLUSTER_1}
+          - ${NOVA_WORKLOAD_CLUSTER_2}
   spreadConstraints:
     spreadMode: Duplicate
     topologyKey: kubernetes.io/metadata.name
     overrides:
-      - topologyValue: kind-workload-1
+      - topologyValue: ${NOVA_WORKLOAD_CLUSTER_1}
         resources:
           - kind: ClusterPolicy
             apiVersion: kyverno.io/v1
@@ -81,8 +81,8 @@ spec:
       - key: kubernetes.io/metadata.name
         operator: In
         values:
-          - kind-workload-1
-          - kind-workload-2
+          - ${NOVA_WORKLOAD_CLUSTER_1}
+          - ${NOVA_WORKLOAD_CLUSTER_2}
   spreadConstraints:
     spreadMode: Duplicate
     topologyKey: kubernetes.io/metadata.name

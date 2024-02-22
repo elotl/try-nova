@@ -13,8 +13,8 @@ spec:
       - key: kubernetes.io/metadata.name
         operator: In
         values:
-          - kind-workload-1
-          - kind-workload-2
+          - ${NOVA_WORKLOAD_CLUSTER_1}
+          - ${NOVA_WORKLOAD_CLUSTER_2}
   spreadConstraints:
     spreadMode: Duplicate
     topologyKey: kubernetes.io/metadata.name
@@ -33,7 +33,7 @@ spec:
       kubernetes.io/metadata.name: psql-operator
   clusterSelector:
     matchLabels:
-      kubernetes.io/metadata.name: kind-workload-1
+      kubernetes.io/metadata.name: ${NOVA_WORKLOAD_CLUSTER_1}
   resourceSelectors:
     labelSelectors:
       - matchLabels:
@@ -49,7 +49,7 @@ spec:
       kubernetes.io/metadata.name: psql-operator
   clusterSelector:
     matchLabels:
-      kubernetes.io/metadata.name: kind-workload-2
+      kubernetes.io/metadata.name: ${NOVA_WORKLOAD_CLUSTER_2}
   resourceSelectors:
     labelSelectors:
       - matchLabels:
@@ -67,7 +67,7 @@ spec:
     matchLabels:
       # this policy schedules HAProxy, which should be placed on a separate cluster than Percona clusters
       # for simplicity of the setup it's placed on the same cluster as the standby Percona cluster
-      kubernetes.io/metadata.name: kind-workload-2  
+      kubernetes.io/metadata.name: ${NOVA_WORKLOAD_CLUSTER_2}  
   resourceSelectors:
     labelSelectors:
       - matchLabels:

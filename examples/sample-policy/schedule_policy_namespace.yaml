@@ -11,7 +11,7 @@ spec:
           - namespace-customer3
   clusterSelector:
     matchLabels:
-      kubernetes.io/metadata.name: kind-workload-3
+      kubernetes.io/metadata.name: ${NOVA_WORKLOAD_CLUSTER_3}
   resourceSelectors:
     labelSelectors:
     - matchExpressions: []

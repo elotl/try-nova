@@ -4,7 +4,7 @@ metadata:
   name: busybox
   namespace: default
   annotations:
-    nova.elotl.co/spread-onto: "kind-workload-1,kind-workload-2::Duplicate"
+    nova.elotl.co/spread-onto: "${NOVA_WORKLOAD_CLUSTER_1},${NOVA_WORKLOAD_CLUSTER_2}::Duplicate"
   labels:
     app: busybox
 spec:

@@ -5,7 +5,7 @@ metadata:
   labels:
     app: nginx
   annotations:
-     nova.elotl.co/cluster: kind-workload-1 
+     nova.elotl.co/cluster: ${NOVA_WORKLOAD_CLUSTER_1}
 spec:
   replicas: 2
   selector:

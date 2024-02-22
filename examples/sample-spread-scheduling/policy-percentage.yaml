@@ -11,17 +11,17 @@ spec:
   spreadConstraints:
     topologyKey: kubernetes.io/metadata.name
     percentageSplit:
-    - topologyValue: kind-workload-1
+    - topologyValue: ${NOVA_WORKLOAD_CLUSTER_1}
       percentage: 20
-    - topologyValue: kind-workload-2
+    - topologyValue: ${NOVA_WORKLOAD_CLUSTER_2}
       percentage: 80
   clusterSelector:
     matchExpressions:
     - key: kubernetes.io/metadata.name
       operator: In
       values:
-      - kind-workload-1
-      - kind-workload-2
+      - ${NOVA_WORKLOAD_CLUSTER_1}
+      - ${NOVA_WORKLOAD_CLUSTER_2}
   resourceSelectors:
     labelSelectors:
     - matchLabels:

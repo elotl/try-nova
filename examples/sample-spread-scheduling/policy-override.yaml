@@ -15,13 +15,13 @@ spec:
       - key: kubernetes.io/metadata.name
         operator: In
         values:
-          - kind-workload-1 # change it to your workload cluster name
-          - kind-workload-2 # change it to your workload cluster name
+          - ${NOVA_WORKLOAD_CLUSTER_1} # change it to your workload cluster name
+          - ${NOVA_WORKLOAD_CLUSTER_2} # change it to your workload cluster name
   spreadConstraints:
     spreadMode: Duplicate
     topologyKey: kubernetes.io/metadata.name
     overrides:
-      - topologyValue: kind-workload-1 # change it to your workload cluster name
+      - topologyValue: ${NOVA_WORKLOAD_CLUSTER_1} # change it to your workload cluster name
         resources:
           - kind: Namespace
             apiVersion: v1
@@ -30,7 +30,7 @@ spec:
               - fieldPath: metadata.labels['topology.istio.io/network']
                 value:
                   staticValue: west-network
-      - topologyValue: kind-workload-2 # change it to your workload cluster name
+      - topologyValue: ${NOVA_WORKLOAD_CLUSTER_2} # change it to your workload cluster name
         resources:
           - kind: Namespace
             apiVersion: v1

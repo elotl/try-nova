@@ -18,13 +18,13 @@ spec:
     - key: kubernetes.io/metadata.name # TODO: do it by labels instead of cluster name
       operator: In
       values:
-      - kind-workload-1
-      - kind-workload-2
+      - ${NOVA_WORKLOAD_CLUSTER_1}
+      - ${NOVA_WORKLOAD_CLUSTER_2}
   spreadConstraints:
     spreadMode: Duplicate
     topologyKey: kubernetes.io/metadata.name
     overrides:
-      - topologyValue: kind-workload-1
+      - topologyValue: ${NOVA_WORKLOAD_CLUSTER_1}
         resources:
           - kind: Deployment
             apiVersion: apps/v1
@@ -34,7 +34,7 @@ spec:
               - fieldPath: spec.template.spec.containers[0].env[0].value
                 value:
                   staticValue: postgres://cluster1-ha.psql-operator.svc:5432/zoo
-      - topologyValue: kind-workload-2
+      - topologyValue: ${NOVA_WORKLOAD_CLUSTER_2}
         resources:
           - kind: Deployment
             apiVersion: apps/v1
@@ -55,7 +55,7 @@ spec:
       kubernetes.io/metadata.name: default
   clusterSelector:
     matchLabels:
-      kubernetes.io/metadata.name: kind-workload-1
+      kubernetes.io/metadata.name: ${NOVA_WORKLOAD_CLUSTER_1}
   resourceSelectors:
     labelSelectors:
       - matchLabels:
@@ -71,7 +71,7 @@ spec:
       kubernetes.io/metadata.name: default
   clusterSelector:
     matchLabels:
-      kubernetes.io/metadata.name: kind-workload-2
+      kubernetes.io/metadata.name: ${NOVA_WORKLOAD_CLUSTER_2}
   resourceSelectors:
     labelSelectors:
       - matchLabels:

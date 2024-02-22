@@ -11,8 +11,8 @@ spec:
       - key: kubernetes.io/metadata.name
         operator: In
         values:
-          - kind-workload-1
-          - kind-workload-2
+          - ${NOVA_WORKLOAD_CLUSTER_1}
+          - ${NOVA_WORKLOAD_CLUSTER_2}
   spreadConstraints:
     topologyKey: kubernetes.io/metadata.name
     spreadMode: Divide

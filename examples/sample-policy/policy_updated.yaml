@@ -8,7 +8,7 @@ spec:
       kubernetes.io/metadata.name: guestbook
   clusterSelector:
     matchLabels:
-      kubernetes.io/metadata.name: kind-workload-2 # change it to the name of one of your workload clusters
+      kubernetes.io/metadata.name: ${NOVA_WORKLOAD_CLUSTER_2} # change it to the name of one of your workload clusters
   resourceSelectors:
     labelSelectors:
       - matchLabels:

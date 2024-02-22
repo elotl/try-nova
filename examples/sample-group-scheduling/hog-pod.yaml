@@ -3,7 +3,7 @@ kind: Pod
 metadata:
   annotations:
     # update it with a name of the workload cluster in Nova control plane which you want to hog
-    nova.elotl.co/cluster: kind-workload-2
+    nova.elotl.co/cluster: ${NOVA_WORKLOAD_CLUSTER_2}
   labels:
     app: nginx
   namespace: default

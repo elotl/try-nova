@@ -7,5 +7,5 @@ metadata:
     # If your workload clusters are named differently, e.g. my-workload-cluster-1 & my-workload-cluster-2,
     # please change it to:
     # nova.elotl.co/spread-onto: "my-workload-cluster-1,my-workload-cluster-2::Duplicate"
-    nova.elotl.co/spread-onto: "kind-workload-1,kind-workload-2::Duplicate"
+    nova.elotl.co/spread-onto: "${NOVA_WORKLOAD_CLUSTER_1},${NOVA_WORKLOAD_CLUSTER_2}::Duplicate"
   name: nginx-group-demo
