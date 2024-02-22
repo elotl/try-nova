@@ -1,0 +1,89 @@
+apiVersion: pgv2.percona.com/v2
+kind: PerconaPGCluster
+metadata:
+  name: cluster1
+  labels:
+    psql-cluster: cluster-1
+spec:
+  image: percona/percona-postgresql-operator:2.1.0-ppg15-postgres
+  imagePullPolicy: Always
+  postgresVersion: 15
+
+  instances:
+  - name: instance1
+    replicas: 3
+    dataVolumeClaimSpec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+
+  proxy:
+    pgBouncer:
+      expose:
+        type: LoadBalancer
+      replicas: 3
+      image: percona/percona-postgresql-operator:2.1.0-ppg15-pgbouncer
+
+  backups:
+    pgbackrest:
+      image: percona/percona-postgresql-operator:2.1.0-ppg15-pgbackrest
+      configuration:
+        - secret:
+            name: cluster1-pgbackrest-secrets
+      repos:
+      - name: repo1
+        schedules:
+          full: "0 0 * * 6"
+#          differential: "0 1 * * 1-6"
+        volume:
+          volumeClaimSpec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 1Gi
+      - name: repo4
+        schedules:
+          full: "* * * * *"
+        s3:
+          bucket: "jan-postgresql-percona-2"
+          endpoint: "s3.eu-west-3.amazonaws.com"
+          region: "eu-west-3"
+
+  users:
+    - name: rhino
+      databases:
+        - zoo
+      options: "SUPERUSER CREATEDB REPLICATION INHERIT LOGIN"
+      password:
+        type: ASCII
+
+    - name: lion
+      databases:
+        - zoo
+      options: "INHERIT LOGIN CREATEROLE"
+      password:
+        type: ASCII
+
+
+  pmm:
+    enabled: false
+    image: percona/pmm-client:2.37.0
+#    imagePullPolicy: IfNotPresent
+    secret: cluster1-pmm-secret
+    serverHost: monitoring-service
+
+  extensions:
+    image: percona/percona-postgresql-operator:2.3.0
+    imagePullPolicy: Always
+    storage:
+      type: s3
+      bucket: "nova-percona-pgvector-extension"
+      region: "eu-west-1"
+      secret:
+        name: ext-secret
+    custom:
+    - name: pgvector
+      version: 0.5.1

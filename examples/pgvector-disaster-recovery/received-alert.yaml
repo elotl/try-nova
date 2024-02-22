@@ -1,0 +1,10 @@
+apiVersion: recovery.elotl.co/v1alpha1
+kind: ReceivedAlert
+metadata:
+  name: testalert
+spec:
+  labels:
+    alertname: testalert
+    app: example-app
+status:
+  processed: false

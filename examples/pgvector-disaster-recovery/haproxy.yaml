@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: haproxy
+  labels:
+    cluster: cluster-ha-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: haproxy
+  template:
+    metadata:
+      labels:
+        app: haproxy
+    spec:
+      containers:
+      - name: haproxy
+        image: haproxy:2.4
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/local/etc/haproxy/haproxy.cfg
+          subPath: haproxy.cfg
+      - name: sidecar-reloader
+        image: elotl/haproxy-sidecar:0.0.1
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/local/etc/haproxy/haproxy.cfg
+          subPath: haproxy.cfg
+      volumes:
+      - name: config-volume
+        configMap:
+          name: haproxy-config
+      imagePullSecrets:
+        - name: dockerhub  # Reference to your Docker Hub credentials secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: haproxy-service
+  labels:
+    cluster: cluster-ha-proxy
+spec:
+  type: LoadBalancer  # Use NodePort if LoadBalancer is not supported in your environment
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+  selector:
+    app: haproxy
