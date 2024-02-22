@@ -2,9 +2,9 @@
 
 set -euo pipefail
 
-cp_cluster="cp"
-workload_cluster_1="workload-1"
-workload_cluster_2="workload-2"
+cp_cluster="${1:-cp}"
+workload_cluster_1="${2:-workload-1}"
+workload_cluster_2="${3:-workload-2}"
 
 # Define kubeconfig paths
 kubeconfig_cp="./kubeconfig-cp"

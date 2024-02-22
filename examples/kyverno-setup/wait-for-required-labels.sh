@@ -7,7 +7,7 @@ start_time=$(date +%s)
 end_time=$((start_time + timeout_seconds))
 
 while true; do
-    kubectl --context kind-workload-1 get clusterpolicies require-labels &>/dev/null
+    kubectl --context=${K8S_CLUSTER_CONTEXT_1} get clusterpolicies require-labels &>/dev/null
     if [ $? -eq 0 ]; then
         echo "Clusterpolicy require-labels exists"
         exit 0
