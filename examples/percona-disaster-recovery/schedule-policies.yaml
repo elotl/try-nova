@@ -62,7 +62,7 @@ metadata:
 spec:
   namespaceSelector:
     matchLabels:
-      kubernetes.io/metadata.name: psql-operator
+      kubernetes.io/metadata.name: default
   clusterSelector:
     matchLabels:
       # this policy schedules HAProxy, which should be placed on a separate cluster than Percona clusters
