@@ -15,7 +15,7 @@ spec:
     labelKey: app
   clusterSelector:
     matchExpressions:
-    - key: kubernetes.io/metadata.name # TODO: do it by labels instead of cluster name
+    - key: kubernetes.io/metadata.name
       operator: In
       values:
       - ${NOVA_WORKLOAD_CLUSTER_1}

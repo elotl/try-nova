@@ -28,13 +28,13 @@ spec:
           value:
             raw: false
         patchType: "application/merge-patch+json"
-    - type: readField # kubectl get service/ferretdb-service-2 -n default --context percona-2 -o=jsonpath='{.spec.clusterIP}'
+    - type: readField # kubectl get service/ferretdb-service-2 -n default --context percona-2 -o=jsonpath='{.status.loadBalancer.ingress[0].ip}'
       readField:
         apiVersion: "v1"
         resource: "services"
         namespace: "default"
         name: "ferretdb-service-2"
-        fieldPath: "spec.clusterIP"
+        fieldPath: "status.loadBalancer.ingress[0].ip"
         outputKey: "Cluster2IP"
     - patch:
         apiVersion: "v1"

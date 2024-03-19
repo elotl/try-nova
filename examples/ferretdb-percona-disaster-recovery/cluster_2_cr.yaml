@@ -7,7 +7,7 @@ metadata:
 spec:
   standby:
     enabled: true
-    repoName: repo4
+    repoName: repo3
   image: percona/percona-postgresql-operator:2.1.0-ppg15-postgres
   imagePullPolicy: Always
   postgresVersion: 15
@@ -48,12 +48,12 @@ spec:
             resources:
               requests:
                 storage: 1Gi
-      - name: repo4
+      - name: repo3
         schedules:
           full: "* * * * *"
         s3:
           bucket: "nova-ferretdb-backup"
-          endpoint: "http://172.18.255.240:9000"
+          endpoint: "https://172.18.255.240:9000"
           region: "eu-west-3"
   pmm:
     enabled: false
