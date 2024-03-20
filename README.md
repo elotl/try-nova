@@ -132,10 +132,10 @@ kubectl config rename-context "kind-${NOVA_WORKLOAD_CLUSTER_1}" ${K8S_CLUSTER_CO
 kubectl config rename-context "kind-${NOVA_WORKLOAD_CLUSTER_2}" ${K8S_CLUSTER_CONTEXT_2}
 ```
 
-To interact with the Nova control plane, use `--context=nova` flag in kubectl commands, e.g.:
+To interact with the Nova control plane, use `--context=${NOVA_CONTROLPLANE_CONTEXT}` flag in kubectl commands, e.g.:
 
 ```sh
-  kubectl --context=nova get clusters
+  kubectl --context=${NOVA_CONTROLPLANE_CONTEXT} get clusters
   NAME              K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE   STANDBY
   kind-workload-1   1.25          workload-1                    True    True   False
   kind-workload-2   1.25          workload-2                    True    True   False
