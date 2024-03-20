@@ -2,9 +2,9 @@
 
 set -euo pipefail
 
-cp_cluster="cp"
-workload_cluster_1="workload-1"
-workload_cluster_2="workload-2"
+cp_cluster="${K8S_HOSTING_CLUSTER:-cp}"
+workload_cluster_1="${NOVA_WORKLOAD_CLUSTER_1:-workload-1}"
+workload_cluster_2="${NOVA_WORKLOAD_CLUSTER_2:-workload-2}"
 
 echo "--- deleting $cp_cluster, $workload_cluster_1, and $workload_cluster_2 kind clusters..."
 

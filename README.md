@@ -102,6 +102,17 @@ Navigate to the root of the repository.
 This script will allow you to create and configure 3 kind clusters - one of them will be the Nova Control Plane and the other two will be Nova workload clusters.
 
 ```sh
+    export NOVA_NAMESPACE=elotl
+    export NOVA_CONTROLPLANE_CONTEXT=nova
+    export K8S_CLUSTER_CONTEXT_1=kind-workload-1
+    export K8S_CLUSTER_CONTEXT_2=kind-workload-2
+    export K8S_HOSTING_CLUSTER=cp
+    export K8S_HOSTING_CLUSTER_CONTEXT=kind-cp
+    export NOVA_WORKLOAD_CLUSTER_1=workload-1
+    export NOVA_WORKLOAD_CLUSTER_2=workload-2
+```
+
+```sh
     ./scripts/setup_trial_env_on_kind.sh
 ```
 
@@ -111,7 +122,15 @@ Once installation finishes, you can use the following command to export Nova Con
     export KUBECONFIG=$HOME/.nova/nova/nova-kubeconfig:$PWD/kubeconfig-cp:$PWD/kubeconfig-workload-1:$PWD/kubeconfig-workload-2
 ```
 
-This gives you access to Nova Control Plane (`nova` context), cluster hosting Nova Control Plane (context `kind-cp`) and two workload clusters (context `kind-workload-1` and `kind-workload-2`)
+This gives you access to Nova Control Plane (`${NOVA_CONTROLPLANE_CONTEXT}` context), cluster hosting Nova Control Plane (context `kind-${K8S_HOSTING_CLUSTER}`) and two workload clusters (context `kind-${NOVA_WORKLOAD_CLUSTER_1}` and `kind-${NOVA_WORKLOAD_CLUSTER_1}`)
+
+You may rename contexts, if You want to give them more meaningful names, as follows:
+
+```sh
+kubectl config rename-context "kind-${K8S_HOSTING_CLUSTER}" ${K8S_HOSTING_CLUSTER_CONTEXT}
+kubectl config rename-context "kind-${NOVA_WORKLOAD_CLUSTER_1}" ${K8S_CLUSTER_CONTEXT_1}
+kubectl config rename-context "kind-${NOVA_WORKLOAD_CLUSTER_2}" ${K8S_CLUSTER_CONTEXT_2}
+```
 
 To interact with the Nova control plane, use `--context=nova` flag in kubectl commands, e.g.:
 
@@ -126,7 +145,7 @@ To interact with the Nova control plane, use `--context=nova` flag in kubectl co
 If you want to run multiple Nova Control Planes you probably will also want to rename your context:
 
 ```sh
-  kubectl config rename-context nova <your custom name>
+  kubectl config rename-context ${NOVA_CONTROLPLANE_CONTEXT} <your custom name>
 ```
 
 ## Nova Tutorials
