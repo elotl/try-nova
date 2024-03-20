@@ -51,7 +51,7 @@ EOF
 echo "--- creating three kind clusters: $cp_cluster, $workload_cluster_1, $workload_cluster_2"
 
 # Define Kubernetes versions and images
-NOVA_K8S_VERSION=${NOVA_E2E_K8S_VERSION:-"v1.26.13"}
+NOVA_K8S_VERSION=${NOVA_E2E_K8S_VERSION:-"v1.28.7"}
 readonly cp_node_image="kindest/node:${NOVA_K8S_VERSION}"
 readonly node_image="kindest/node:${NOVA_K8S_VERSION}"
 
