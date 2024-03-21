@@ -89,11 +89,11 @@ sudo novactl kubectl-install
 
 ## Installation of Nova on KIND (Kubernetes in Docker) clusters
 
-Make sure you have the correct `novactl` version (= 0.7.1) installed:
+Make sure you have the correct `novactl` version (= 0.9.0) installed:
 
 ```sh
   kubectl nova --version
-  novactl version v0.7.1 (git: a97586b5) built: 20231103080341
+  kubectl-nova version v0.9.0 (git: 58407116) built: 20240312092623
 
 ```
 
@@ -136,10 +136,12 @@ To interact with the Nova control plane, use `--context=${NOVA_CONTROLPLANE_CONT
 
 ```sh
   kubectl --context=${NOVA_CONTROLPLANE_CONTEXT} get clusters
-  NAME              K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE   STANDBY
-  kind-workload-1   1.25          workload-1                    True    True   False
-  kind-workload-2   1.25          workload-2                    True    True   False
+```
 
+```text
+  NAME    K8S-VERSION   K8S-CLUSTER   REGION   ZONE   READY   IDLE   STANDBY
+  wlc-1   1.28          wlc-1                         True    True   False
+  wlc-2   1.28          wlc-2                         True    True   False  
 ```
 
 If you want to run multiple Nova Control Planes you probably will also want to rename your context:
