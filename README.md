@@ -102,14 +102,14 @@ Navigate to the root of the repository.
 This script will allow you to create and configure 3 kind clusters - one of them will be the Nova Control Plane and the other two will be Nova workload clusters.
 
 ```sh
-    export NOVA_NAMESPACE=elotl
-    export NOVA_CONTROLPLANE_CONTEXT=nova
-    export K8S_CLUSTER_CONTEXT_1=kind-workload-1
-    export K8S_CLUSTER_CONTEXT_2=kind-workload-2
-    export K8S_HOSTING_CLUSTER=cp
-    export K8S_HOSTING_CLUSTER_CONTEXT=kind-cp
-    export NOVA_WORKLOAD_CLUSTER_1=workload-1
-    export NOVA_WORKLOAD_CLUSTER_2=workload-2
+export NOVA_NAMESPACE=elotl
+export NOVA_CONTROLPLANE_CONTEXT=nova
+export K8S_CLUSTER_CONTEXT_1=k8s-cluster-1
+export K8S_CLUSTER_CONTEXT_2=k8s-cluster-2
+export K8S_HOSTING_CLUSTER_CONTEXT=k8s-cluster-hosting-cp
+export NOVA_WORKLOAD_CLUSTER_1=wlc-1
+export NOVA_WORKLOAD_CLUSTER_2=wlc-2
+export K8S_HOSTING_CLUSTER=hosting-cluster
 ```
 
 ```sh
