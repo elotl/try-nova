@@ -89,12 +89,13 @@ sudo novactl kubectl-install
 
 ## Installation of Nova on KIND (Kubernetes in Docker) clusters
 
-Make sure you have the correct `novactl` version (= 0.9.0) installed:
+Make sure you have the expected `novactl` version installed. If you're expecting to use `v0.9.0` this is how you can check:
 
 ```sh
   kubectl nova --version
+```
+```sh
   kubectl-nova version v0.9.0 (git: 58407116) built: 20240312092623
-
 ```
 
 Navigate to the root of the repository.
@@ -106,9 +107,9 @@ export NOVA_NAMESPACE=elotl
 export NOVA_CONTROLPLANE_CONTEXT=nova
 export K8S_CLUSTER_CONTEXT_1=k8s-cluster-1
 export K8S_CLUSTER_CONTEXT_2=k8s-cluster-2
-export K8S_HOSTING_CLUSTER_CONTEXT=k8s-cluster-hosting-cp
-export NOVA_WORKLOAD_CLUSTER_1=wlc-1
-export NOVA_WORKLOAD_CLUSTER_2=wlc-2
+export K8S_HOSTING_CLUSTER_CONTEXT=kind-hosting-cluster
+export NOVA_WORKLOAD_CLUSTER_1=kind-wlc-1
+export NOVA_WORKLOAD_CLUSTER_2=kind-wlc-2
 export K8S_HOSTING_CLUSTER=hosting-cluster
 ```
 
@@ -124,14 +125,6 @@ Once installation finishes, you can use the following command to export Nova Con
 
 This gives you access to Nova Control Plane (`${NOVA_CONTROLPLANE_CONTEXT}` context), cluster hosting Nova Control Plane (context `kind-${K8S_HOSTING_CLUSTER}`) and two workload clusters (context `kind-${NOVA_WORKLOAD_CLUSTER_1}` and `kind-${NOVA_WORKLOAD_CLUSTER_1}`)
 
-You may rename contexts, if You want to give them more meaningful names, as follows:
-
-```sh
-kubectl config rename-context "kind-${K8S_HOSTING_CLUSTER}" ${K8S_HOSTING_CLUSTER_CONTEXT}
-kubectl config rename-context "kind-${NOVA_WORKLOAD_CLUSTER_1}" ${K8S_CLUSTER_CONTEXT_1}
-kubectl config rename-context "kind-${NOVA_WORKLOAD_CLUSTER_2}" ${K8S_CLUSTER_CONTEXT_2}
-```
-
 To interact with the Nova control plane, use `--context=${NOVA_CONTROLPLANE_CONTEXT}` flag in kubectl commands, e.g.:
 
 ```sh
@@ -144,10 +137,14 @@ To interact with the Nova control plane, use `--context=${NOVA_CONTROLPLANE_CONT
   wlc-2   1.28          wlc-2                         True    True   False  
 ```
 
-If you want to run multiple Nova Control Planes you probably will also want to rename your context:
+*Optional*
+
+You may rename Kubernetes contexts, if you want to give them more meaningful names, as follows:
 
 ```sh
-  kubectl config rename-context ${NOVA_CONTROLPLANE_CONTEXT} <your custom name>
+kubectl config rename-context "kind-${K8S_HOSTING_CLUSTER}" ${K8S_HOSTING_CLUSTER_CONTEXT}
+kubectl config rename-context "kind-${NOVA_WORKLOAD_CLUSTER_1}" ${K8S_CLUSTER_CONTEXT_1}
+kubectl config rename-context "kind-${NOVA_WORKLOAD_CLUSTER_2}" ${K8S_CLUSTER_CONTEXT_2}
 ```
 
 ## Nova Tutorials
