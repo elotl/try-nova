@@ -162,4 +162,4 @@ kubectl config rename-context "kind-${NOVA_WORKLOAD_CLUSTER_2}" ${K8S_CLUSTER_CO
 
 # Beyond KIND
 
-If you'd like to try Nova on the cloud (AWS, GCP, Azure, OCI, on-prem), please grab free trial bits at https://www.elotl.co/free-trial.html
+If you'd like to try Nova on the cloud (AWS, GCP, Azure, OCI, on-prem), please grab free trial bits at https://www.elotl.co/nova-free-trial.html
