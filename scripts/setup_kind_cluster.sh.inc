@@ -14,38 +14,48 @@ kubeconfig_workload_2="./kubeconfig-workload-2"
 # Determine the directory of the current script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
-# Function to create a kind cluster
-create_kind_cluster() {
-    local cluster_name=$1
-    local kubeconfig_path=$2
-    local image=$3 # Renamed to avoid conflict with readonly variables
-    local extra_port_mappings=${4:-}
+cluster_definition_yaml() {
+    local image=$1
+    local extra_port_mappings=$2
 
-    touch "$kubeconfig_path"
-    export KUBECONFIG="$kubeconfig_path"
-
-    if [[ -n "$extra_port_mappings" ]]; then
-        cat <<EOF | kind create cluster --name "$cluster_name" --config=-
+    cat <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
 - role: control-plane
   image: ${image}
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        max-pods: "250"
+EOF
+
+	if [ "$extra_port_mappings" = true ]
+	then
+		cat <<EOF
   extraPortMappings:
   - containerPort: 32222
     hostPort: 80
   - containerPort: 32222
     hostPort: 443
 EOF
-    else
-        cat <<EOF | kind create cluster --name "$cluster_name" --config=-
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-nodes:
-- role: control-plane
-  image: ${image}
-EOF
-    fi
+	fi
+}
+
+# Function to create a kind cluster
+create_kind_cluster() {
+    local cluster_name=$1
+    local kubeconfig_path=$2
+    local image=$3
+    local extra_port_mappings=$4
+
+    touch "$kubeconfig_path"
+    export KUBECONFIG="$kubeconfig_path"
+
+    cluster_definition_yaml "$image" "$extra_port_mappings" |
+        kind create cluster --name "$cluster_name" --config=-
 }
 
 echo "--- creating three kind clusters: $cp_cluster, $workload_cluster_1, $workload_cluster_2"
@@ -56,9 +66,9 @@ readonly cp_node_image="kindest/node:${NOVA_K8S_VERSION}"
 readonly node_image="kindest/node:${NOVA_K8S_VERSION}"
 
 # Create clusters
-create_kind_cluster "$cp_cluster" "$kubeconfig_cp" "$cp_node_image" "true"
-create_kind_cluster "$workload_cluster_1" "$kubeconfig_workload_1" "$node_image"
-create_kind_cluster "$workload_cluster_2" "$kubeconfig_workload_2" "$node_image"
+create_kind_cluster "$cp_cluster" "$kubeconfig_cp" "$cp_node_image" true
+create_kind_cluster "$workload_cluster_1" "$kubeconfig_workload_1" "$node_image" false
+create_kind_cluster "$workload_cluster_2" "$kubeconfig_workload_2" "$node_image" false
 
 echo "--- clusters created."
 
