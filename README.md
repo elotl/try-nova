@@ -123,7 +123,7 @@ Once installation finishes, you can use the following command to export Nova Con
     export KUBECONFIG=$HOME/.nova/nova/nova-kubeconfig:$PWD/kubeconfig-cp:$PWD/kubeconfig-workload-1:$PWD/kubeconfig-workload-2
 ```
 
-This gives you access to Nova Control Plane (`${NOVA_CONTROLPLANE_CONTEXT}` context), cluster hosting Nova Control Plane (context `kind-${K8S_HOSTING_CLUSTER}`) and two workload clusters (context `kind-${NOVA_WORKLOAD_CLUSTER_1}` and `kind-${NOVA_WORKLOAD_CLUSTER_1}`)
+This gives you access to Nova Control Plane (`${NOVA_CONTROLPLANE_CONTEXT}` context), cluster hosting Nova Control Plane (context `kind-${K8S_HOSTING_CLUSTER}`) and two workload clusters (context `kind-${NOVA_WORKLOAD_CLUSTER_1}` and `kind-${NOVA_WORKLOAD_CLUSTER_2}`)
 
 To interact with the Nova control plane, use `--context=${NOVA_CONTROLPLANE_CONTEXT}` flag in kubectl commands, e.g.:
 
