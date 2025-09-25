@@ -247,9 +247,17 @@ Look at `vCluster-2` - you should see 8 Nginx replicas on it!
 KUBECONFIG=./kubeconfig-vcluster-2 kubectl get deployment
 ```
 
-Feeling brave? Edit the SchedulePolicy to change pod split percentage values in `spec:spreadConstraints:percentageSplit:percentage` from 20:80 to any other value of you liking using `kubectl --context=nova edit schedulepolicy vcluster-schedule-policy.yaml`. Watch Nova dynamically rebalance the pod split across the two vClusters!
+Feeling brave? Edit the SchedulePolicy to change pod split percentages in `spec:spreadConstraints:percentageSplit:percentage` from 20:80 to any other value, say 50:50.
+```sh
+kubectl --context=nova edit schedulepolicy spread-group-policy
+```
+Watch Nova dynamically rebalance pod split across the two vClusters - `vCluster-1` should now have 5 replicas and `vCluster-2` should have 5 replicas as well to honor 50:50 split!
+```sh
+KUBECONFIG=./kubeconfig-vcluster-1 kubectl get deployment
+KUBECONFIG=./kubeconfig-vcluster-2 kubectl get deployment
+```
 
-Curious about other fun Nova Schedule Policies? Check them out here! 
+Want to explore other fun Nova Schedule Policies? Check them out here! 
 * [Annotation-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-annotation-based-scheduling)
 * [Policy-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-policy-based-scheduling)
 * [Capacity-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-capacity-based-scheduling)
@@ -262,6 +270,6 @@ After you are done with the trial, delete vCluster environment.
 ./scripts/teardown_vcluster.sh
 ```
 
-# Beyond KIND / vClusters
+# Beyond KIND / vCluster
 
 If you'd like to try Nova on hyperscalers (AWS, GCP, Azure, OCI, etc), neoclouds (CoreWeave, Lambda, etc), or on-prem, please grab free trial bits at https://www.elotl.co/nova-free-trial.html
