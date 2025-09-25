@@ -48,12 +48,11 @@ sysctl -n fs.inotify.max_user_instances
 ```
 
 
-## Install Nova's command line tool `novactl`
+## Install `novactl`
 
-`novactl` is our CLI that allows you to easily create new Nova Control Planes, register new Nova Workload Clusters, check the health of your Nova cluster, and more!
+`novactl` is a CLI that allows you to easily create new Nova Control Planes, register new Nova Workload Clusters, check the health of your Nova cluster, and more!
 
-### Download `novactl`
-
+Download `novactl`.
 ```bash
 curl -s https://api.github.com/repos/elotl/novactl/releases/latest | \
 jq -r '.assets[].browser_download_url' | \
@@ -61,33 +60,23 @@ grep "$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m | sed 's/x86_64/amd64/
 xargs -I {} curl -L {} -o novactl
 ```
 
-### Install `novactl`
-
-#### Make the binary executable
-
-Once you have the binary, run:
-
+Make sure `novactl` is executable.
 ```bash
 chmod +x novactl
 ```
 
-#### Place the binary in your PATH
-
-The following is an example to install the plugin in `/usr/local/bin` for Unix-like operating systems:
+Place `novactl` in your PATH. The following is an example to install the plugin in `/usr/local/bin` for Unix-like operating systems:
 
 ```bash
 sudo mv novactl /usr/local/bin/novactl
 ```
 
-#### Install it as kubectl plugin
-
-`novactl` is ready to work as a [kubectl plugin](https://kubernetes.io/docs/tasks/extend-kubectl/kubectl-plugins/). **Our docs assume you're using `novactl` as kubectl plugin**. To make this work, simply run:
-
+Install `novactl` as a [kubectl plugin](https://kubernetes.io/docs/tasks/extend-kubectl/kubectl-plugins/). **Our docs assume you're using `novactl` as kubectl plugin**. To make this work, simply run:
 ```bash
 sudo novactl kubectl-install
 ```
 
-## Installation of Nova on KIND (Kubernetes in Docker) clusters
+## Try Nova on KIND
 
 Make sure you have the expected `novactl` version installed. If you're expecting to use `v0.9.0` this is how you can check:
 
@@ -137,18 +126,130 @@ To interact with the Nova control plane, use `--context=${NOVA_CONTROLPLANE_CONT
   wlc-2   1.28          wlc-2                         True    True   False  
 ```
 
-*Optional*
-
-You may rename Kubernetes contexts, if you want to give them more meaningful names, as follows:
-
+*Optional* You may rename Kubernetes contexts, if you want to give them more meaningful names, as follows:
 ```sh
 kubectl config rename-context "kind-${K8S_HOSTING_CLUSTER}" ${K8S_HOSTING_CLUSTER_CONTEXT}
 kubectl config rename-context "kind-${NOVA_WORKLOAD_CLUSTER_1}" ${K8S_CLUSTER_CONTEXT_1}
 kubectl config rename-context "kind-${NOVA_WORKLOAD_CLUSTER_2}" ${K8S_CLUSTER_CONTEXT_2}
 ```
 
-## Nova Tutorials
+Explore Nova Tutorials.
+* [Annotation-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-annotation-based-scheduling)
+* [Policy-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-policy-based-scheduling)
+* [Capacity-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-capacity-based-scheduling)
+* [Spread Scheduling](https://docs.elotl.co/nova/Tutorials/poc-spread-onto-multiple-clusters)
+* [Just In Time Clusters](https://docs.elotl.co/nova/Tutorials/poc-standby-workload-cluster)
 
+Delete Nova trial environment.
+```sh
+    ./scripts/teardown_kind_cluster.sh
+```
+
+## Try Nova on vCluster
+
+[Install vCluster](https://www.vcluster.com/install) command line.
+```sh
+  brew install loft-sh/tap/vcluster
+```
+
+Verify `novactl` is installed.
+```sh
+  kubectl nova --version
+```
+
+Navigate to the root of this repository and setup enviornment variables for trial environment.
+```sh
+export NOVA_NAMESPACE=elotl
+export NOVA_CONTROLPLANE_CONTEXT=nova
+export K8S_CLUSTER_CONTEXT_1=k8s-cluster-1
+export K8S_CLUSTER_CONTEXT_2=k8s-cluster-2
+export K8S_HOSTING_CLUSTER_CONTEXT=kind-hosting-cluster
+export NOVA_WORKLOAD_CLUSTER_1=wlc-1
+export NOVA_WORKLOAD_CLUSTER_2=wlc-2
+export K8S_HOSTING_CLUSTER=hosting-cluster
+export VCLUSTER_1=vcluster-1
+export VCLUSTER_2=vcluster-2
+```
+
+Create trial environment with 3 Kind clusters. First Kind cluster will host Nova. Second Kind cluster will host `vCluster-1`. Third Kind cluster will host `vCluster-2`. Nova will manage `vCluster-1` and `vCluster-2` as a fleet.
+```sh
+    ./scripts/setup_vcluster.sh
+```
+
+You should see the two vClusters as part of Nova's fleet.
+
+```sh
+kubectl --context=nova get clusters
+```
+
+Let us run a simple tutorial where Nova spreads pods for an Nginx deployment in a 20:80 fashion across the two vClusters.
+
+Create Nova SchedulePolicy.
+```sh
+cat <<EOF > ./vcluster-schedule-policy.yaml
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: spread-group-policy
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: default
+  groupBy:
+    labelKey: app
+  spreadConstraints:
+    topologyKey: kubernetes.io/metadata.name
+    percentageSplit:
+    - topologyValue: vcluster-vcluster-1-vcluster-1-kind-wlc-1 
+      percentage: 20
+    - topologyValue: vcluster-vcluster-2-vcluster-2-kind-wlc-2
+      percentage: 80
+  clusterSelector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name
+      operator: In
+      values:
+      - vcluster-vcluster-1-vcluster-1-kind-wlc-1
+      - vcluster-vcluster-2-vcluster-2-kind-wlc-2
+  resourceSelectors:
+    labelSelectors:
+    - matchLabels:
+        group-policy: nginx-spread
+EOF
+```
+
+Apply the SchedulePolicy.
+```sh
+kubectl --context=nova apply -f ./vcluster-schedule-policy.yaml
+```
+
+Feel free to inspect the newly created SchedulePolicy in Nova.
+```sh
+kubectl --context=nova get schedulepolicies
+```
+
+Create Nginx deployment.
+```sh
+kubectl --context=nova apply -f examples/sample-spread-scheduling/nginx-app.yaml
+```
+
+Verify Nova sees 10 replicas of Nginx.
+```sh
+kubectl --context=nova get deployment
+```
+
+Look at `vCluster-1` - you should see 2 Nginx replicas on it!
+```sh
+KUBECONFIG=./kubeconfig-vcluster-1 kubectl get deployment
+```
+Look at `vCluster-2` - you should see 8 Nginx replicas on it!
+```
+KUBECONFIG=./kubeconfig-vcluster-2 kubectl get deployment
+```
+
+Feeling brave? Edit the SchedulePolicy to change pod split percentage values in `spec:spreadConstraints:percentageSplit:percentage` from 20:80 to any other value of you liking using `kubectl --context=nova edit schedulepolicy vcluster-schedule-policy.yaml`. Watch Nova dynamically rebalance the pod split across the two vClusters!
+
+Curious about other fun Nova Schedule Policies? Check them out here! 
 * [Annotation-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-annotation-based-scheduling)
 * [Policy-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-policy-based-scheduling)
 * [Capacity-based Scheduling](https://docs.elotl.co/nova/Tutorials/poc-capacity-based-scheduling)
@@ -156,10 +257,11 @@ kubectl config rename-context "kind-${NOVA_WORKLOAD_CLUSTER_2}" ${K8S_CLUSTER_CO
 * [Just In Time Clusters](https://docs.elotl.co/nova/Tutorials/poc-standby-workload-cluster)
 
 
-## Deleting Nova trial sandbox
+After you are done with the trial, delete vCluster environment.
+```sh
+./scripts/teardown_vcluster.sh
+```
 
-    ./scripts/teardown_kind_cluster.sh
+# Beyond KIND / vClusters
 
-# Beyond KIND
-
-If you'd like to try Nova on the cloud (AWS, GCP, Azure, OCI, on-prem), please grab free trial bits at https://www.elotl.co/nova-free-trial.html
+If you'd like to try Nova on hyperscalers (AWS, GCP, Azure, OCI, etc), neoclouds (CoreWeave, Lambda, etc), or on-prem, please grab free trial bits at https://www.elotl.co/nova-free-trial.html
