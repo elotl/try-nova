@@ -11,3 +11,10 @@ echo "--- deleting $cp_cluster, $workload_cluster_1, and $workload_cluster_2 kin
 kind delete cluster --name $cp_cluster
 kind delete cluster --name $workload_cluster_1
 kind delete cluster --name $workload_cluster_2
+
+REPO_ROOT=$(pwd)
+kubeconfig_cp="${REPO_ROOT}/kubeconfig-cp"
+kubeconfig_workload_1="${REPO_ROOT}/kubeconfig-workload-1"
+kubeconfig_workload_2="${REPO_ROOT}/kubeconfig-workload-2"
+echo "--- Deleting KubeConfig files $kubeconfig_cp $kubeconfig_workload_1 $kubeconfig_workload_2 schedule-policy.yaml ..."
+rm $kubeconfig_cp $kubeconfig_workload_1 $kubeconfig_workload_2 schedule-policy.yaml
