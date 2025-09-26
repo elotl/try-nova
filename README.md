@@ -176,6 +176,11 @@ Create trial environment with 3 Kind clusters. First Kind cluster will host Nova
     ./scripts/setup_vcluster.sh
 ```
 
+Update KUBECONFIG to include Nova.
+```sh
+export KUBECONFIG=~/.kube/config:$HOME/.nova/nova/nova-kubeconfig
+```
+
 You should see the two vClusters as part of Nova's fleet.
 
 ```sh
