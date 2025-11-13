@@ -1,0 +1,19 @@
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: priority-policy-${WORKLOAD_NAMESPACE}
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: ${WORKLOAD_NAMESPACE}
+  resourceSelectors:
+    labelSelectors:
+    - matchLabels:
+        ${WORKLOAD_LABELKEY}: ${WORKLOAD_LABELVAL}
+  groupBy:
+    labelKey: ${WORKLOAD_LABELKEY}
+  orderedClusterSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values: [${SORTED_CLUSTER_LIST}]

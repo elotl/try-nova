@@ -1,0 +1,17 @@
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: spread-all-policy-${WORKLOAD_NAMESPACE}
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: ${WORKLOAD_NAMESPACE}
+  resourceSelectors:
+    labelSelectors:
+    - matchLabels:
+        ${WORKLOAD_LABELKEY}: ${WORKLOAD_LABELVAL}
+  spreadConstraints:
+    spreadMode: Duplicate
+    topologyKey: kubernetes.io/metadata.name
+  groupBy:
+    labelKey: ${WORKLOAD_LABELKEY}
