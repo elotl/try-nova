@@ -24,7 +24,7 @@ export WORKLOAD_LABELVAL=$6
 ############
 echo -e "\nGenerate gated workload deployment to gather cost information"
 #  Deploy spread/duplicate policy for workload Namespace and LabelKey,LabelVal
-envsubst < ${TRY_NOVA_PATH}/policies/spreadallpolicy.yaml | kubectl apply -f -
+envsubst < ${TRY_NOVA_PATH}/thrifty-nova/spreadallpolicy.yaml | kubectl apply -f -
 #  Deploy schedgated.yaml
 kubectl apply -f ${GATED_YAML} -n ${WORKLOAD_NAMESPACE}
 #  Delay to allow Nova spread scheduling and Luna cost estimation
@@ -107,6 +107,6 @@ echo $SORTED_CLUSTER_LIST
 
 echo -e "\nGenerate ungated workload deployment based on cost information"
 #  Deploy priority policy for workload Namespace and LabelKey,LabelVal
-envsubst < ${TRY_NOVA_PATH}/policies/clusterprioritypolicy.yaml | kubectl apply -f -
+envsubst < ${TRY_NOVA_PATH}/thrifty-nova/clusterprioritypolicy.yaml | kubectl apply -f -
 #  Deploy not schedgated.yaml
 kubectl apply -f ${UNGATED_YAML} -n ${WORKLOAD_NAMESPACE}
