@@ -1,0 +1,24 @@
+apiVersion: policy.elotl.co/v1alpha1
+kind: SchedulePolicy
+metadata:
+  name: fill-and-spill-policy-1
+spec:
+  namespaceSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+          - default
+  groupBy:
+    labelKey: test
+  orderedClusterSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+          - ${NOVA_WORKLOAD_CLUSTER_2}
+          - ${NOVA_WORKLOAD_CLUSTER_1}
+  resourceSelectors:
+    labelSelectors:
+      - matchLabels:
+          groupingFeatureTest: "true"
