@@ -165,11 +165,11 @@ Verify Nova sees 10 replicas of Nginx.
 kubectl --context=nova get deployment
 ```
 
-Look at `wlc-1` - you should see 2 Nginx replicas on it!
+Look at `wlc-1` - you should see 8 Nginx replicas on it!
 ```sh
 KUBECONFIG=./kubeconfig-workload-1 kubectl get deployment
 ```
-Look at `workload-2` - you should see 8 Nginx replicas on it!
+Look at `workload-2` - you should see 2 Nginx replicas on it!
 ```
 KUBECONFIG=./kubeconfig-workload-2 kubectl get deployment
 ```
