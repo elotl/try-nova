@@ -32,17 +32,29 @@ if [[ -z "$network_info" ]]; then
     exit 1
 fi
 
-# Extract the Gateway from the first IPAM Config that has a Gateway set
-gateway=$(echo "$network_info" | jq -r '.[0].IPAM.Config | map(select(.Gateway != null)) | .[0].Gateway')
-if [[ -z "$gateway" || "$gateway" == "null" ]]; then
-    echo "Error: Gateway not found."
+# Extract the Gateway from the first IPAM Config that has a Gateway set.  Use gateway w/IPV4 suffix
+gateways=$(echo "$network_info" | jq -r '.[0].IPAM.Config | map(select(.Gateway != null)) | .[].Gateway')
+gateway=""
+suffix="0.1"
+if [[ -z "$gateways" || "$gateways" == "null" ]]; then
+    echo "Error: Gateway(s) not found."
     exit 1
 else
-    echo "Gateway: $gateway"
+    gateway_array=( $gateways )
+    for gw in "${gateway_array[@]}"; do
+        if [[ "$gw" == *"$suffix" ]]; then
+            gateway=$gw
+            break
+        fi
+    done
+    if [[ -z $gateway ]]; then
+        echo "Error: IPV4 Gateway not found."
+        exit 1
+    fi
 fi
+echo "Gateway: $gateway"
 
 # Configure and apply MetalLB address pool
-suffix="0.1"
 foo="${gateway%"$suffix"}"
 export RANGE_START="${foo}255.${range_start_suffix}"
 export RANGE_END="${foo}255.${range_end_suffix}"
