@@ -135,7 +135,7 @@ Make sure to set the KUBECONFIG env variable first before running this script:
 export KUBECONFIG=~/.kube/k0s-vm1-config
 ```
 
-Edit this script to update the VM_IP to the IP address of the K0s control plane node if its not a single-node k0s cluster. The IP range for metallb should match the IP range chosen in the ClusterConfig during k0s install.
+Edit this script to update the `VM_IP` to the IP address of the K0s control plane node if it's not a single-node k0s cluster. The `IP range` for metallb should also be editted to match the `IP range` chosen in the ClusterConfig manifest used during k0s install.
 
 ```ssh
 ./install_metallb.sh
