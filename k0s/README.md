@@ -24,7 +24,7 @@ sudo mkdir -p /etc/k0s
 
 This config will specify a range of IPs (e.g. 192.168.1.200-210) that will be used during the Metallb setup
 Create a file: `/etc/k0s/k0s.yaml` with the manifest given below. Replace `$CLUSTER_NAME` and `$VM_IP` with the cluster
-name (eg, "k0s-vm1") and IP address of your VM (e.g. 192.168.1.74). Replace the example list of IP addresses below to a range that will work with the local IPs of your VMs.
+name (eg, "k0s-vm1") and IP address of your VM (e.g. 192.168.1.74).
 
 IP address of your VM can be determined using the `ip a` command.
 
@@ -134,8 +134,6 @@ Make sure to set the KUBECONFIG env variable first before running this script:
 ```ssh
 export KUBECONFIG=~/.kube/k0s-vm1-config
 ```
-
-Edit this script to update the `VM_IP` to the IP address of the K0s control plane node if it's not a single-node k0s cluster. The `IP range` for metallb should also be editted to match the `IP range` chosen in the ClusterConfig manifest used during k0s install.
 
 ```ssh
 ./install_metallb.sh
