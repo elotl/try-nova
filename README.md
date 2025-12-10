@@ -97,7 +97,7 @@ export K8S_HOSTING_CLUSTER=hosting-cluster
 
 Create trial environment with 3 Kind clusters. First Kind cluster will host Nova. Second Kind cluster will host workload cluster `wlc-1`. Third Kind cluster will host workload cluster `wlc-2`. Nova will manage `wlc-1` and `wlc-2` as a fleet.
 ```sh
-./scripts/setup_kind.sh
+./scripts/setup_trial_env_on_kind.sh
 ```
 
 Update KUBECONFIG to include Nova and workload clusters.
@@ -193,7 +193,8 @@ Want to explore other fun Nova Schedule Policies? Check them out here!
 
 After you are done with the trial, delete Kind environment.
 ```sh
-./scripts/teardown_kind.sh
+./scripts/teardown_kind_cluster.sh
+./scripts/cleanup_files.sh
 ```
 
 ## Try Nova on vCluster
