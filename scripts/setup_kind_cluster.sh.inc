@@ -65,10 +65,20 @@ NOVA_K8S_VERSION=${NOVA_E2E_K8S_VERSION:-"v1.33.4"}
 readonly cp_node_image="kindest/node:${NOVA_K8S_VERSION}"
 readonly node_image="kindest/node:${NOVA_K8S_VERSION}"
 
-# Create clusters
-create_kind_cluster "$cp_cluster" "$kubeconfig_cp" "$cp_node_image" true
-create_kind_cluster "$workload_cluster_1" "$kubeconfig_workload_1" "$node_image" false
-create_kind_cluster "$workload_cluster_2" "$kubeconfig_workload_2" "$node_image" false
+# Create clusters in parallel
+create_kind_cluster "$cp_cluster" "$kubeconfig_cp" "$cp_node_image" true &
+PID_CP=$!
+
+create_kind_cluster "$workload_cluster_1" "$kubeconfig_workload_1" "$node_image" false &
+PID_W1=$!
+
+create_kind_cluster "$workload_cluster_2" "$kubeconfig_workload_2" "$node_image" false &
+PID_W2=$!
+
+# Wait for all cluster creations to finish
+wait $PID_CP
+wait $PID_W1
+wait $PID_W2
 
 echo "--- clusters created."
 

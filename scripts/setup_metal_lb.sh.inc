@@ -19,7 +19,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 applyMetalLB() {
     echo "--- Configuring Metal Load Balancer for cluster using kubeconfig: ${kubeconfig_path}"
     KUBECONFIG="${kubeconfig_path}" kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml
-    KUBECONFIG="${kubeconfig_path}" kubectl patch -n metallb-system deploy controller --type='json' -p '[{"op": "add", "path": "/spec/strategy/rollingUpdate/maxUnavailable", "value": 0}]'
+    KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait deploy controller --timeout=120s --for=condition=Available || true
+    KUBECONFIG="${kubeconfig_path}" kubectl patch -n metallb-system deploy controller --type='json' -p '[{"op": "add", "path": "/spec/strategy/rollingUpdate/maxUnavailable", "value": 0}]' || echo "Warning: Failed to patch controller deployment"
 }
 
 # Setup Metal Load Balancer for a workload cluster
