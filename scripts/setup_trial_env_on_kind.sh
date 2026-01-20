@@ -47,11 +47,23 @@ extract_nova_node_ip() {
 
 # Function to deploy Nova control plane
 deploy_nova_control_plane() {
-    local image_tag_option=""
+    local image_tag=""
     if [[ -n "${IMAGE_TAG:-}" ]]; then
-        image_tag_option="--image-tag ${IMAGE_TAG}"
+        image_tag="--image-tag=${IMAGE_TAG}"
     fi
-    KUBECONFIG="${kubeconfig_cp}" NOVA_NODE_IP=$(extract_nova_node_ip) kubectl nova install cp --image-repository "${SCHEDULER_IMAGE_REPO}" ${image_tag_option} --context kind-${K8S_HOSTING_CLUSTER} ${NOVA_CONTROLPLANE_CONTEXT}
+    local image_pull_policy=""
+    if [[ -n "${IMAGE_PULL_POLICY}" ]]; then
+        image_pull_policy="--image-pull-policy=${IMAGE_PULL_POLICY}"
+    fi
+    env \
+        KUBECONFIG="${kubeconfig_cp}" \
+        NOVA_NODE_IP=$(extract_nova_node_ip) \
+    kubectl nova install cp \
+        --image-repository "${SCHEDULER_IMAGE_REPO}" \
+        "${image_tag}" \
+        "${image_pull_policy}" \
+        --context kind-${K8S_HOSTING_CLUSTER} \
+        ${NOVA_CONTROLPLANE_CONTEXT}
 }
 
 # Function to deploy Nova agents
