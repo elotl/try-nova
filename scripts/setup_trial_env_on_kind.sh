@@ -76,7 +76,18 @@ deploy_nova_agents() {
         if [[ -n "${IMAGE_TAG:-}" ]]; then
             image_tag_option="--image-tag ${IMAGE_TAG}"
         fi
-        KUBECONFIG="$kubeconfig" kubectl nova install agent --image-repository "${AGENT_IMAGE_REPO}" ${image_tag_option} --context "${context}" "${AGENT_NAME_PREFIX}""${name}"
+        local image_pull_policy=""
+        if [[ -n "${IMAGE_PULL_POLICY}" ]]; then
+            image_pull_policy="--image-pull-policy=${IMAGE_PULL_POLICY}"
+        fi
+        env \
+            KUBECONFIG="$kubeconfig" \
+        kubectl nova install agent \
+            --image-repository "${AGENT_IMAGE_REPO}" \
+            ${image_tag_option} \
+            ${image_pull_policy} \
+            --context "${context}" \
+            "${AGENT_NAME_PREFIX}""${name}"
     done
 }
 
