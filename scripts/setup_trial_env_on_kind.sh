@@ -52,7 +52,7 @@ deploy_nova_control_plane() {
         image_tag="--image-tag=${IMAGE_TAG}"
     fi
     local image_pull_policy=""
-    if [[ -n "${IMAGE_PULL_POLICY}" ]]; then
+    if [[ -n "${IMAGE_PULL_POLICY:-}" ]]; then
         image_pull_policy="--image-pull-policy=${IMAGE_PULL_POLICY}"
     fi
     env \
@@ -77,7 +77,7 @@ deploy_nova_agents() {
             image_tag_option="--image-tag ${IMAGE_TAG}"
         fi
         local image_pull_policy=""
-        if [[ -n "${IMAGE_PULL_POLICY}" ]]; then
+        if [[ -n "${IMAGE_PULL_POLICY:-}" ]]; then
             image_pull_policy="--image-pull-policy=${IMAGE_PULL_POLICY}"
         fi
         env \
