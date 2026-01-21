@@ -60,8 +60,8 @@ deploy_nova_control_plane() {
         NOVA_NODE_IP=$(extract_nova_node_ip) \
     kubectl nova install cp \
         --image-repository "${SCHEDULER_IMAGE_REPO}" \
-        "${image_tag}" \
-        "${image_pull_policy}" \
+        ${image_tag} \
+        ${image_pull_policy} \
         --context kind-${K8S_HOSTING_CLUSTER} \
         ${NOVA_CONTROLPLANE_CONTEXT}
 }

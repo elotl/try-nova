@@ -54,20 +54,38 @@ deploy_nova_control_plane() {
     if [[ -n "${IMAGE_TAG:-}" ]]; then
         image_tag_option="--image-tag ${IMAGE_TAG}"
     fi
-    KUBECONFIG="${kubeconfig_cp}" NOVA_NODE_IP=$(extract_nova_node_ip) kubectl nova install cp --image-repository "${SCHEDULER_IMAGE_REPO}" ${image_tag_option} --context kind-${K8S_HOSTING_CLUSTER} ${NOVA_CONTROLPLANE_CONTEXT}
+    local image_pull_policy=""
+    if [[ -n "${IMAGE_PULL_POLICY:-}" ]]; then
+        image_pull_policy="--image-pull-policy=$IMAGE_PULL_POLICY"
+    fi
+    KUBECONFIG="${kubeconfig_cp}" NOVA_NODE_IP=$(extract_nova_node_ip) kubectl nova install cp \
+        --image-repository "${SCHEDULER_IMAGE_REPO}" \
+        ${image_tag_option} \
+        ${image_pull_policy} \
+        --context kind-${K8S_HOSTING_CLUSTER} \
+        ${NOVA_CONTROLPLANE_CONTEXT}
 }
 
 # Function to deploy Nova agents
 deploy_nova_agents() {
     clusters=("${kubeconfig_vcluster_1} vcluster_${VCLUSTER_1}_${VCLUSTER_1}_kind-${NOVA_WORKLOAD_CLUSTER_1} vcluster_${VCLUSTER_1}_${VCLUSTER_1}_kind-${NOVA_WORKLOAD_CLUSTER_1}" "${kubeconfig_vcluster_2} vcluster_${VCLUSTER_2}_${VCLUSTER_2}_kind-${NOVA_WORKLOAD_CLUSTER_2} vcluster_${VCLUSTER_2}_${VCLUSTER_2}_kind-${NOVA_WORKLOAD_CLUSTER_2}")
 
+    local image_tag_option=""
+    if [[ -n "${IMAGE_TAG:-}" ]]; then
+        image_tag_option="--image-tag ${IMAGE_TAG}"
+    fi
+    local image_pull_policy=""
+    if [[ -n "${IMAGE_PULL_POLICY:-}" ]]; then
+        image_pull_policy="--image-pull-policy=$IMAGE_PULL_POLICY"
+    fi
     for cluster in "${clusters[@]}"; do
         read -r kubeconfig context name <<< "$cluster"
-        local image_tag_option=""
-        if [[ -n "${IMAGE_TAG:-}" ]]; then
-            image_tag_option="--image-tag ${IMAGE_TAG}"
-        fi
-        KUBECONFIG="$kubeconfig" kubectl nova install agent --image-repository "${AGENT_IMAGE_REPO}" ${image_tag_option} --context "${context}" "${AGENT_NAME_PREFIX}""${name}"
+        KUBECONFIG="$kubeconfig" kubectl nova install agent \
+            --image-repository "${AGENT_IMAGE_REPO}" \
+            ${image_tag_option} \
+            ${image_pull_policy} \
+            --context "${context}" \
+            "${AGENT_NAME_PREFIX}""${name}"
     done
 }
 
