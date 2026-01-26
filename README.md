@@ -20,14 +20,14 @@ We love feedback, so please feel free to ask questions by creating an issue in t
 
 You should have:
 
-- Installed and running [Docker](https://docs.docker.com/engine/install/) (tested on version `27.0.3`)
-- Installed [Kind](https://kind.sigs.k8s.io/docs/user/quick-start) (tested on version `0.21.0`)
-- Installed [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) (tested on client version `v1.31.0`)
-- Installed [jq](https://jqlang.github.io/jq/download/) (tested on version `1.7`)
-- Installed [envsubst](https://github.com/a8m/envsubst) (tested on version `0.22.4`)
+- Installed and running [Docker](https://docs.docker.com/engine/install/) (tested on version `29.1.3`)
+- Installed [Kind](https://kind.sigs.k8s.io/docs/user/quick-start) (tested on version `0.31.0`)
+- Installed [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) (tested on client version `v1.33.3`)
+- Installed [jq](https://jqlang.github.io/jq/download/) (tested on version `1.7.1`)
+- Installed [envsubst](https://github.com/a8m/envsubst) (tested on version `0.22.5`)
 
 Please note that Nova on KIND is tested on:
-1. Mac OS Version 13.6
+1. Mac OS Version 26.2
 2. Ubuntu Version 22.04.1
 
 In some Linux environments, the default [inotify](https://linux.die.net/man/7/inotify) resource configuration might not allow you to create sufficient Kind clusters to successfully install Nova. View more about why this is needed [here](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files)
