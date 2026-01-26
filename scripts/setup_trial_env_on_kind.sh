@@ -66,6 +66,71 @@ deploy_nova_control_plane() {
         ${NOVA_CONTROLPLANE_CONTEXT}
 }
 
+# Function to patch GPU nodes
+patch_node_gpu() {
+    local kubeconfig="$1"
+    local node_name="$2"
+    local gpu_type="$3"
+    local gpu_count="$4"
+    local gpu_product="$5"
+    local gpu_memory="$6"
+
+    KUBECONFIG="${kubeconfig}" kubectl patch node "${node_name}" --type merge --patch "
+metadata:
+  labels:
+    ${gpu_type}.com/gpu.count: \"${gpu_count}\"
+    ${gpu_type}.com/gpu.product: \"${gpu_product}\"
+    ${gpu_type}.com/gpu.memory: \"${gpu_memory}\"
+"
+}
+
+# Function to patch GPU capacity in workload clusters
+patch_workload_gpu_capacity() {
+    local kubeconfig="$1"
+    local cluster_name="$2"
+    local resource_name="$3"
+    
+    KUBECONFIG="${kubeconfig}" kubectl get nodes -o name | while read -r node; do
+        node_name=$(echo "$node" | cut -d'/' -f2)
+        echo "Patching GPU capacity on node: $node_name in $cluster_name cluster"
+        KUBECONFIG="${kubeconfig}" kubectl patch node "${node_name}" --subresource=status --type=json -p '[
+            {"op":"add","path":"/status/capacity/'${resource_name}'","value":"4"},
+            {"op":"add","path":"/status/allocatable/'${resource_name}'","value":"4"}
+        ]'
+    done
+}
+
+# Function to patch GPU labels in workload clusters
+patch_workload_gpu_labels() {
+    local kubeconfig="$1"
+    local cluster_name="$2"
+    local gpu_type="$3"
+    local gpu_count="$4"
+    local gpu_model="$5"
+    local gpu_memory="$6"
+    
+    KUBECONFIG="${kubeconfig}" kubectl get nodes -o name | while read -r node; do
+        node_name=$(echo "$node" | cut -d'/' -f2)
+        echo "Patching $gpu_type GPU on node: $node_name in $cluster_name cluster"
+        patch_node_gpu "${kubeconfig}" "$node_name" "$gpu_type" "$gpu_count" "$gpu_model" "$gpu_memory"
+    done
+}
+
+# Function to patch GPU nodes in workload clusters
+patch_workload_gpu_nodes() {
+    # Patch workload 1 cluster with NVIDIA GPUs
+    patch_workload_gpu_labels "${kubeconfig_workload_1}" "workload-1" "nvidia" "4" "NVIDIA-A100-PCIE-80GB" "81920"
+    
+    # Patch workload 2 cluster with AMD GPUs
+    patch_workload_gpu_labels "${kubeconfig_workload_2}" "workload-2" "amd" "4" "AMD-MI300X-192G" "196608"
+    
+    # Patch workload 1 cluster capacity
+    patch_workload_gpu_capacity "${kubeconfig_workload_1}" "workload-1" "nvidia.com~1gpu"
+    
+    # Patch workload 2 cluster capacity
+    patch_workload_gpu_capacity "${kubeconfig_workload_2}" "workload-2" "amd.com~1gpu"
+}
+
 # Function to deploy Nova agents
 deploy_nova_agents() {
     clusters=("${kubeconfig_workload_1} kind-${NOVA_WORKLOAD_CLUSTER_1} ${NOVA_WORKLOAD_CLUSTER_1}" "${kubeconfig_workload_2} kind-${NOVA_WORKLOAD_CLUSTER_2} ${NOVA_WORKLOAD_CLUSTER_2}")
@@ -114,6 +179,7 @@ wait_and_apply_nova_cluster_init() {
 # Check if clusters already exist
 if [ "$(clusters_exist)" = false ]; then
     source "${SCRIPT_DIR}/setup_kind_cluster.sh.inc" ${K8S_HOSTING_CLUSTER} ${NOVA_WORKLOAD_CLUSTER_1} ${NOVA_WORKLOAD_CLUSTER_2}
+    patch_workload_gpu_nodes
 else
     # TODO: when we start using different env vars we need to make sure we don't skip 
     # and leave user with clusters setup with different names
