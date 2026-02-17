@@ -75,6 +75,30 @@ yaml_squote() {
 	printf "'%s'" "$s"
 }
 
+patch_object_type() {
+    local value=$1
+    local kind=$2
+    local group=$3
+    local version=$4
+    cat <<EOF
+  - patch: |-
+      - op: add
+        path: /metadata/labels
+        value: {}
+      - op: add
+        path: /metadata/labels/nova.elotl.co~1type
+        value: ${value}
+    target:
+      group: ${group}
+      version: ${version}
+      kind: ${kind}
+EOF
+}
+
+patch_object_type_system() {
+    patch_object_type system "$1" "$2" "$3"
+}
+
 {
 	cat <<EOF
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -83,6 +107,19 @@ kind: Kustomization
 resources:
   - input.yaml
 
+patches:
+EOF
+
+patch_object_type_system Namespace '' v1
+patch_object_type_system IngressClass 'networking.k8s.io' v1
+patch_object_type_system PriorityClass 'scheduling.k8s.io' v1
+patch_object_type_system ClusterRoleBinding 'rbac.authorization.k8s.io' v1
+patch_object_type_system ClusterRole 'rbac.authorization.k8s.io' v1
+patch_object_type_system MutatingWebhookConfiguration 'admissionregistration.k8s.io' v1
+patch_object_type_system ValidatingWebhookConfiguration 'admissionregistration.k8s.io' v1
+patch_object_type_system CustomResourceDefinition 'apiextensions.k8s.io' v1
+
+cat <<EOF
 labels:
   - pairs:
 EOF
