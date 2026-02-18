@@ -99,6 +99,10 @@ patch_object_type_system() {
     patch_object_type system "$1" "$2" "$3"
 }
 
+patch_object_type_namespaced() {
+	patch_object_type namespaced "$1" "$2" "$3"
+}
+
 {
 	cat <<EOF
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -118,6 +122,15 @@ patch_object_type_system ClusterRole 'rbac.authorization.k8s.io' v1
 patch_object_type_system MutatingWebhookConfiguration 'admissionregistration.k8s.io' v1
 patch_object_type_system ValidatingWebhookConfiguration 'admissionregistration.k8s.io' v1
 patch_object_type_system CustomResourceDefinition 'apiextensions.k8s.io' v1
+
+patch_object_type_namespaced ConfigMap '' v1
+patch_object_type_namespaced Secret '' v1
+patch_object_type_namespaced ServiceAccount '' v1
+patch_object_type_namespaced Ingress 'networking.k8s.io' v1
+patch_object_type_namespaced NetworkPolicy 'networking.k8s.io' v1
+patch_object_type_namespaced Role 'rbac.authorization.k8s.io' v1
+patch_object_type_namespaced RoleBinding 'rbac.authorization.k8s.io' v1
+patch_object_type_namespaced HorizontalPodAutoscaler 'autoscaling' v2
 
 cat <<EOF
 labels:
