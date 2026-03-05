@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
-# Create example Nova policies with sensible defaults. It creates 3 policies:
+# Create example Nova policies with sensible defaults.
 #
-# 1. `system_policy.yaml` for system and configuration objects that will be duplicated across all clusters
-# 2. TODO
-# 3. TODO
+# Use it like this:
+#
+#   sample_policies.sh -l nova=duplicate duplicate nova | kubectl --context nova apply -f -
 #
 # Requires kubectl >= 1.24
 #
@@ -17,12 +17,19 @@ usage() {
 Create sample policies for Nova.
 
 Usage:
-  sample_policies.sh -l key=value [-l key=value ...]
+  sample_policies.sh -l key=value [-l key=value ...] [-p policy-prefix] <command>
+
+Commands:
+  duplicate <group-by-key>
+
 EOF
 	exit $1
 }
 
 labels=()
+prefix=''
+command=''
+labelKey=''
 
 while [[ $# -gt 0 ]]; do
 	case "$1" in
@@ -31,8 +38,25 @@ while [[ $# -gt 0 ]]; do
 		labels+=("$2")
 		shift 2
 		;;
+	-p | --prefix)
+		if [[ -z "$2" ]]; then
+			echo "Missing value for --prefix" >&2
+			usage 2
+		fi
+		prefix=$2
+		shift 2
+		;;
 	-h | --help)
 		usage 0
+		;;
+	duplicate)
+		if [[ -z "$2" ]]; then
+			echo "Missing group by label key for duplicate command" >&2
+			usage 2
+		fi
+		command=duplicate
+		labelKey=$2
+		shift 2
 		;;
 	*)
 		echo "Unknown arg: $1" >&2
@@ -70,17 +94,21 @@ print_labels() {
 	done
 }
 
-# The system policy duplicates all the objects accross all clusters.
-{
+schedule_policy() {
+	local name=$1
+	shift
+	local spreadconstraints=$1
+	shift
+	local objects=$1
+	shift
+
 	cat <<EOF
 apiVersion: policy.elotl.co/v1alpha1
 kind: SchedulePolicy
 metadata:
-  name: system
+  name: ${name}
 spec:
-  spreadConstraints:
-    spreadMode: Duplicate
-    topologyKey: kubernetes.io/metadata.name
+${spreadconstraints}
   namespaceSelector:
     matchLabels:
 EOF
@@ -90,10 +118,13 @@ EOF
     labelSelectors:
       - matchLabels:
 EOF
-	print_labels 8
-	cat <<EOF
-    kinds:
-      - kind: Namespace
+	print_labels 10
+	printf '    kinds:\n%s' "$objects"
+	# Extra
+	printf '%s' "$@"
+}
+
+readonly system_objects='      - kind: Namespace
         version: v1
         group: core
       - kind: IngressClass
@@ -117,6 +148,79 @@ EOF
       - kind: CustomResourceDefinition
         version: v1
         group: apiextensions.k8s.io
+'
 
-EOF
-} >system_policy.yaml
+readonly namespaced_objects='      - kind: ConfigMap
+        version: v1
+        group: core
+      - kind: Secret
+        version: v1
+        group: core
+      - kind: ServiceAccount
+        version: v1
+        group: core
+      - kind: Ingress
+        version: v1
+        group: networking.k8s.io
+      - kind: NetworkPolicy
+        version: v1
+        group: networking.k8s.io
+      - kind: RoleBinding
+        version: v1
+        group: rbac.authorization.k8s.io
+      - kind: Role
+        version: v1
+        group: rbac.authorization.k8s.io
+      - kind: HorizontalPodAutoscaler
+        version: v2
+        group: autoscaling
+'
+
+readonly allocated_objects='     - kind: Pod
+       version: v1
+       group: core
+     - kind: Deployment
+       version: v1
+       group: apps
+     - kind: StatefulSet
+       version: v1
+       group: apps
+     - kind: DaemonSet
+       version: v1
+       group: apps
+     - kind: Job
+       version: v1
+       group: batch
+     - kind: CronJob
+       version: v1
+       group: batch
+     - kind: ReplicaSet
+       version: v1
+       group: apps
+     - kind: PersistentVolumeClaim
+       version: v1
+       group: core
+     - kind: Service
+       version: v1
+       group: core
+'
+
+readonly spread_constraints_duplicate="  groupBy:
+    labelKey: ${labelKey}
+  spreadConstraints:
+    spreadMode: Duplicate
+    topologyKey: kubernetes.io/metadata.name"
+
+case "$command" in
+duplicate)
+	schedule_policy "${prefix}system" "$spread_constraints_duplicate" "$system_objects"
+	echo '---'
+	schedule_policy "${prefix}namespaced" "$spread_constraints_duplicate" "$namespaced_objects"
+	echo '---'
+	schedule_policy "${prefix}allocated" "$spread_constraints_duplicate" "$allocated_objects"
+	;;
+*)
+	echo 'No command specified' >&2
+	usage 2
+	;;
+esac
