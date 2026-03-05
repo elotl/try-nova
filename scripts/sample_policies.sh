@@ -14,12 +14,11 @@ set -euo pipefail
 # Argument is exit code
 usage() {
 	cat >&2 <<'EOF'
-Create sample policies for Nova.
-
 Usage:
   sample_policies.sh -l key=value [-l key=value ...] [-p policy-prefix] <command>
 
 Commands:
+  select <group-by-key>
   duplicate <group-by-key>
 
 EOF
@@ -50,11 +49,20 @@ while [[ $# -gt 0 ]]; do
 		usage 0
 		;;
 	duplicate)
-		if [[ -z "$2" ]]; then
+		if [[ $# -lt 2 || -z "$2" ]]; then
 			echo "Missing group by label key for duplicate command" >&2
 			usage 2
 		fi
 		command=duplicate
+		labelKey=$2
+		shift 2
+		;;
+	select)
+		if [[ $# -lt 2 || -z "$2" ]]; then
+			echo "Missing group by label key for select command" >&2
+			usage 2
+		fi
+		command=select
 		labelKey=$2
 		shift 2
 		;;
@@ -205,19 +213,29 @@ readonly allocated_objects='     - kind: Pod
        group: core
 '
 
-readonly spread_constraints_duplicate="  groupBy:
+readonly spread_duplicate_section="  groupBy:
     labelKey: ${labelKey}
   spreadConstraints:
     spreadMode: Duplicate
     topologyKey: kubernetes.io/metadata.name"
 
+readonly select_section="  groupBy:
+    labelKey: ${labelKey}"
+
 case "$command" in
 duplicate)
-	schedule_policy "${prefix}system" "$spread_constraints_duplicate" "$system_objects"
+	schedule_policy "${prefix}system" "$spread_duplicate_section" "$system_objects"
 	echo '---'
-	schedule_policy "${prefix}namespaced" "$spread_constraints_duplicate" "$namespaced_objects"
+	schedule_policy "${prefix}namespaced" "$spread_duplicate_section" "$namespaced_objects"
 	echo '---'
-	schedule_policy "${prefix}allocated" "$spread_constraints_duplicate" "$allocated_objects"
+	schedule_policy "${prefix}allocated" "$spread_duplicate_section" "$allocated_objects"
+	;;
+select)
+	schedule_policy "${prefix}system" "$select_section" "$system_objects"
+	echo '---'
+	schedule_policy "${prefix}namespaced" "$select_section" "$namespaced_objects"
+	echo '---'
+	schedule_policy "${prefix}allocated" "$select_section" "$allocated_objects"
 	;;
 *)
 	echo 'No command specified' >&2
