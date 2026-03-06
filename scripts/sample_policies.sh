@@ -20,6 +20,7 @@ Usage:
 Commands:
   select <group-by-key>
   duplicate <group-by-key>
+  divide <group-by-key>
 
 EOF
 	exit $1
@@ -63,6 +64,15 @@ while [[ $# -gt 0 ]]; do
 			usage 2
 		fi
 		command=select
+		labelKey=$2
+		shift 2
+		;;
+	divide)
+		if [[ $# -lt 2 || -z "$2" ]]; then
+			echo "Missing group by label key for divide command" >&2
+			usage 2
+		fi
+		command=divide
 		labelKey=$2
 		shift 2
 		;;
@@ -116,6 +126,8 @@ kind: SchedulePolicy
 metadata:
   name: ${name}
 spec:
+  groupBy:
+    labelKey: ${labelKey}
 ${spreadconstraints}
   namespaceSelector:
     matchLabels:
@@ -213,14 +225,13 @@ readonly allocated_objects='     - kind: Pod
        group: core
 '
 
-readonly spread_duplicate_section="  groupBy:
-    labelKey: ${labelKey}
-  spreadConstraints:
+readonly spread_duplicate_section="  spreadConstraints:
     spreadMode: Duplicate
     topologyKey: kubernetes.io/metadata.name"
 
-readonly select_section="  groupBy:
-    labelKey: ${labelKey}"
+readonly spread_divide_section="  spreadConstraints:
+    spreadMode: Divide
+    topologyKey: kubernetes.io/metadata.name"
 
 case "$command" in
 duplicate)
@@ -231,11 +242,18 @@ duplicate)
 	schedule_policy "${prefix}allocated" "$spread_duplicate_section" "$allocated_objects"
 	;;
 select)
-	schedule_policy "${prefix}system" "$select_section" "$system_objects"
+	schedule_policy "${prefix}system" '' "$system_objects"
 	echo '---'
-	schedule_policy "${prefix}namespaced" "$select_section" "$namespaced_objects"
+	schedule_policy "${prefix}namespaced" '' "$namespaced_objects"
 	echo '---'
-	schedule_policy "${prefix}allocated" "$select_section" "$allocated_objects"
+	schedule_policy "${prefix}allocated" '' "$allocated_objects"
+	;;
+divide)
+	schedule_policy "${prefix}system" "$spread_duplicate_section" "$system_objects"
+	echo '---'
+	schedule_policy "${prefix}namespaced" "$spread_duplicate_section" "$namespaced_objects"
+	echo '---'
+	schedule_policy "${prefix}allocated" "$spread_divide_section" "$allocated_objects"
 	;;
 *)
 	echo 'No command specified' >&2
