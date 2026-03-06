@@ -57,7 +57,7 @@ deploy_nova_control_plane() {
     fi
     env \
         KUBECONFIG="${kubeconfig_cp}" \
-        EXTRA_API_SERVER_ENDPOINTS=$(extract_nova_node_ip) \
+        NOVA_NODE_IP=$(extract_nova_node_ip) \
     kubectl nova install cp \
         --image-repository "${SCHEDULER_IMAGE_REPO}" \
         ${image_tag} \

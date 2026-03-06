@@ -58,7 +58,7 @@ deploy_nova_control_plane() {
     if [[ -n "${IMAGE_PULL_POLICY:-}" ]]; then
         image_pull_policy="--image-pull-policy=$IMAGE_PULL_POLICY"
     fi
-    KUBECONFIG="${kubeconfig_cp}" EXTRA_API_SERVER_ENDPOINTS=$(extract_nova_node_ip) kubectl nova install cp \
+    KUBECONFIG="${kubeconfig_cp}" NOVA_NODE_IP=$(extract_nova_node_ip) kubectl nova install cp \
         --image-repository "${SCHEDULER_IMAGE_REPO}" \
         ${image_tag_option} \
         ${image_pull_policy} \
