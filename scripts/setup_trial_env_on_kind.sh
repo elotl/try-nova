@@ -190,7 +190,6 @@ nova_node_ip=$(extract_nova_node_ip)
 echo "Nova node IP: $nova_node_ip"
 
 export APISERVER_ENDPOINT_PATCH="${nova_node_ip}:32222"
-export APISERVER_SERVICE_NODEPORT="32222"
 export NOVA_API_PUBLIC_HOST_OVERRIDE="0.0.0.0"
 
 deploy_nova_control_plane
