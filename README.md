@@ -56,7 +56,7 @@ Download `novactl`.
 ```bash
 curl -s https://api.github.com/repos/elotl/novactl/releases/latest | \
 jq -r '.assets[].browser_download_url' | \
-grep "$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m | sed 's/x86_64/amd64/;s/i386/386/;s/aarch64/arm64/')" | \
+grep "$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')" | \
 xargs -I {} curl -L {} -o novactl
 ```
 
