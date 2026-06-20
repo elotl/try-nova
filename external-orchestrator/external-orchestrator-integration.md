@@ -6,9 +6,9 @@ Nova can be integrated with an external workload orchestrator that handles workl
 
 1. Nova evaluates a workload's matching `SchedulePolicy` and selects a target cluster based on available resources and policy constraints.
 2. Nova records the target cluster on the workload object via the `nova.elotl.co/target-cluster` label.
-3. The external orchestrator reads the `nova.elotl.co/target-cluster` label and submits the workload to the chosen cluster, adding the label `nova.elotl.co/schedule=true` to the workload on that cluster.
+3. The external orchestrator reads the `nova.elotl.co/target-cluster` label and submits the workload to the chosen cluster, adding the label `nova.elotl.co/schedule: "true"` to the workload on that cluster.
 4. Nova marks the schedule status as `delegated`, indicating that placement responsibility has been delegated to the external orchestrator.
-5. The Nova Agent on the workload cluster detects the `nova.elotl.co/schedule=true` label and begins watching the workload for status changes. Once the workload is running, its status is available in the Nova Control Plane.
+5. The Nova Agent on the workload cluster detects the `nova.elotl.co/schedule: "true"` label and begins watching the workload for status changes. Once the workload is running, its status is available in the Nova Control Plane.
 
 
 ## Installing the Nova Agent
@@ -39,7 +39,7 @@ kubectl --context=<NOVA_CONTROLPLANE_CONTEXT> get deployment <deployment-name> \
   -o jsonpath='{.metadata.labels.nova\.elotl\.co/target-cluster}'
 ```
 
-The external orchestrator reads this label and places the workload on the chosen target cluster, with the `nova.elotl.co/schedule=true` label set on the workload object in that cluster.
+The external orchestrator reads this label and places the workload on the chosen target cluster, with the `nova.elotl.co/schedule: "true"` label set on the workload object in that cluster.
 
 To confirm Nova is tracking the workload and propagating status, check that the label is present on the workload:
 
