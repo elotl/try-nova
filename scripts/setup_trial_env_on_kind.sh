@@ -151,6 +151,7 @@ deploy_nova_agents() {
             --image-repository "${AGENT_IMAGE_REPO}" \
             ${image_tag_option} \
             ${image_pull_policy} \
+            --reschedule-initial-delay "10s" \
             --context "${context}" \
             "${AGENT_NAME_PREFIX}""${name}"
     done
