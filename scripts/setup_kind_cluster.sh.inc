@@ -64,6 +64,13 @@ echo "--- creating three kind clusters: $cp_cluster, $workload_cluster_1, $workl
 NOVA_K8S_VERSION=${NOVA_E2E_K8S_VERSION:-"v1.35.1"}
 readonly cp_node_image="kindest/node:${NOVA_K8S_VERSION}"
 readonly node_image="kindest/node:${NOVA_K8S_VERSION}"
+readonly metallb_controller_image="quay.io/metallb/controller:v0.16.1"
+readonly metallb_speaker_image="quay.io/metallb/speaker:v0.16.1"
+
+docker pull "$metallb_controller_image" &
+PID_METALLB_CONTROLLER=$!
+docker pull "$metallb_speaker_image" &
+PID_METALLB_SPEAKER=$!
 
 # Create clusters in parallel
 create_kind_cluster "$cp_cluster" "$kubeconfig_cp" "$cp_node_image" true &
@@ -79,14 +86,33 @@ PID_W2=$!
 wait $PID_CP
 wait $PID_W1
 wait $PID_W2
+wait $PID_METALLB_CONTROLLER
+wait $PID_METALLB_SPEAKER
+
+for cluster in "$cp_cluster" "$workload_cluster_1" "$workload_cluster_2"; do
+    kind load docker-image --name "$cluster" "$metallb_controller_image" "$metallb_speaker_image" &
+done
+wait
 
 echo "--- clusters created."
 
 # Configure Metal Load Balancers using the script in the same directory as this script
 echo "--- configuring Metal Load Balancers for clusters..."
-source "${SCRIPT_DIR}/setup_metal_lb.sh.inc" "$kubeconfig_cp" "200" "210"
-source "${SCRIPT_DIR}/setup_metal_lb.sh.inc" "$kubeconfig_workload_1" "211" "230"
-source "${SCRIPT_DIR}/setup_metal_lb.sh.inc" "$kubeconfig_workload_2" "231" "255"
+(
+    source "${SCRIPT_DIR}/setup_metal_lb.sh.inc" "$kubeconfig_cp" "200" "210"
+) &
+PID_METALLB_CP=$!
+(
+    source "${SCRIPT_DIR}/setup_metal_lb.sh.inc" "$kubeconfig_workload_1" "211" "230"
+) &
+PID_METALLB_W1=$!
+(
+    source "${SCRIPT_DIR}/setup_metal_lb.sh.inc" "$kubeconfig_workload_2" "231" "255"
+) &
+PID_METALLB_W2=$!
+wait $PID_METALLB_CP
+wait $PID_METALLB_W1
+wait $PID_METALLB_W2
 
 echo "--- Metal Load Balancer installed in all clusters."
 echo "--- Clusters ready for nova-scheduler and nova-agent deployments."

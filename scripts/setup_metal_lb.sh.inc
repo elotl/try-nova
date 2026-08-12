@@ -18,8 +18,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 # Function to apply MetalLB configuration
 applyMetalLB() {
     echo "--- Configuring Metal Load Balancer for cluster using kubeconfig: ${kubeconfig_path}"
-    KUBECONFIG="${kubeconfig_path}" kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml
-    KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait deploy controller --timeout=120s --for=condition=Available || true
+    KUBECONFIG="${kubeconfig_path}" kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.16.1/config/manifests/metallb-native.yaml
     KUBECONFIG="${kubeconfig_path}" kubectl patch -n metallb-system deploy controller --type='json' -p '[{"op": "add", "path": "/spec/strategy/rollingUpdate/maxUnavailable", "value": 0}]' || echo "Warning: Failed to patch controller deployment"
 }
 
@@ -59,11 +58,12 @@ echo "Gateway: $gateway"
 foo="${gateway%"$suffix"}"
 export RANGE_START="${foo}255.${range_start_suffix}"
 export RANGE_END="${foo}255.${range_end_suffix}"
-envsubst < "${SCRIPT_DIR}/metal_lb_addrpool_template.yaml" > "./metal_lb_addrpool.yaml"
+addrpool_file=$(mktemp "${TMPDIR:-/tmp}/metal_lb_addrpool_XXXXXX.yaml")
+envsubst < "${SCRIPT_DIR}/metal_lb_addrpool_template.yaml" > "$addrpool_file"
 echo "--- Metal LB config:"
-cat "./metal_lb_addrpool.yaml"
-KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait pod --all --timeout=1200s --for=condition=Ready
-KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait deploy controller --timeout=1200s --for=condition=Available
-KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait apiservice v1beta1.metallb.io --timeout=1200s --for=condition=Available
-KUBECONFIG="${kubeconfig_path}" kubectl apply -f ./metal_lb_addrpool.yaml
-rm -f ./metal_lb_addrpool.yaml
+cat "$addrpool_file"
+KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait pod --all --timeout=300s --for=condition=Ready
+KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait deploy controller --timeout=300s --for=condition=Available
+KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait apiservice v1beta1.metallb.io --timeout=300s --for=condition=Available
+KUBECONFIG="${kubeconfig_path}" kubectl apply -f "$addrpool_file"
+rm -f "$addrpool_file"
