@@ -58,7 +58,8 @@ echo "Gateway: $gateway"
 foo="${gateway%"$suffix"}"
 export RANGE_START="${foo}255.${range_start_suffix}"
 export RANGE_END="${foo}255.${range_end_suffix}"
-addrpool_file=$(mktemp "${TMPDIR:-/tmp}/metal_lb_addrpool_XXXXXX.yaml")
+tmp_dir=$(mktemp -d "${TMPDIR:-/tmp}/metal_lb_addrpool.XXXXXX")
+addrpool_file="${tmp_dir}/metal_lb_addrpool.yaml"
 envsubst < "${SCRIPT_DIR}/metal_lb_addrpool_template.yaml" > "$addrpool_file"
 echo "--- Metal LB config:"
 cat "$addrpool_file"
@@ -85,10 +86,10 @@ until KUBECONFIG="${kubeconfig_path}" kubectl apply -f "$addrpool_file"; do
     attempt=$((attempt + 1))
     if [[ $attempt -ge 10 ]]; then
         echo "Error: failed to apply MetalLB address pool after ${attempt} attempts." >&2
-        rm -f "$addrpool_file"
+        rm -rf "$tmp_dir"
         exit 1
     fi
     echo "--- apply failed (attempt ${attempt}), webhook likely not ready yet, retrying in 3s..."
     sleep 3
 done
-rm -f "$addrpool_file"
+rm -rf "$tmp_dir"
