@@ -65,5 +65,30 @@ cat "$addrpool_file"
 KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait pod --all --timeout=300s --for=condition=Ready
 KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait deploy controller --timeout=300s --for=condition=Available
 KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait apiservice v1beta1.metallb.io --timeout=300s --for=condition=Available
-KUBECONFIG="${kubeconfig_path}" kubectl apply -f "$addrpool_file"
+
+# Readiness above doesn't mean kube-proxy programmed the webhook Service's
+# ClusterIP rules yet -- short lag can still refuse the first webhook call.
+# Wait for a ready endpoint before applying.
+echo "--- waiting for metallb-webhook-service endpoints to be ready..."
+for i in $(seq 1 60); do
+    ready_addrs=$(KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system get endpoints metallb-webhook-service \
+        -o jsonpath='{.subsets[*].addresses}' 2>/dev/null)
+    if [[ -n "$ready_addrs" && "$ready_addrs" != "[]" ]]; then
+        break
+    fi
+    sleep 2
+done
+
+# Retry apply too, in case webhook still refuses despite endpoint check.
+attempt=0
+until KUBECONFIG="${kubeconfig_path}" kubectl apply -f "$addrpool_file"; do
+    attempt=$((attempt + 1))
+    if [[ $attempt -ge 10 ]]; then
+        echo "Error: failed to apply MetalLB address pool after ${attempt} attempts." >&2
+        rm -f "$addrpool_file"
+        exit 1
+    fi
+    echo "--- apply failed (attempt ${attempt}), webhook likely not ready yet, retrying in 3s..."
+    sleep 3
+done
 rm -f "$addrpool_file"
