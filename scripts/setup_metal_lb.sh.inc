@@ -63,6 +63,19 @@ addrpool_file="${tmp_dir}/metal_lb_addrpool.yaml"
 envsubst < "${SCRIPT_DIR}/metal_lb_addrpool_template.yaml" > "$addrpool_file"
 echo "--- Metal LB config:"
 cat "$addrpool_file"
+
+# 'kubectl wait --all' errors immediately with "no matching resources found"
+# (rather than polling) if no pods exist yet at the moment it's invoked, which
+# can happen right after apply. Since this script is sourced under `set -e`,
+# that immediate error would silently abort MetalLB setup for this cluster.
+# Wait for at least one pod to exist before waiting for it to be Ready.
+for i in $(seq 1 60); do
+    pod_count=$(KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system get pods --no-headers 2>/dev/null | wc -l)
+    if [[ "$pod_count" -gt 0 ]]; then
+        break
+    fi
+    sleep 2
+done
 KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait pod --all --timeout=300s --for=condition=Ready
 KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait deploy controller --timeout=300s --for=condition=Available
 KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait apiservice v1beta1.metallb.io --timeout=300s --for=condition=Available
