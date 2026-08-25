@@ -61,7 +61,7 @@ create_kind_cluster() {
 echo "--- creating three kind clusters: $cp_cluster, $workload_cluster_1, $workload_cluster_2"
 
 # Define Kubernetes versions and images
-NOVA_K8S_VERSION=${NOVA_E2E_K8S_VERSION:-"v1.35.1"}
+NOVA_K8S_VERSION=${NOVA_E2E_K8S_VERSION:-"v1.35.5"}
 readonly cp_node_image="kindest/node:${NOVA_K8S_VERSION}"
 readonly node_image="kindest/node:${NOVA_K8S_VERSION}"
 readonly metallb_controller_image="quay.io/metallb/controller:v0.16.1"
