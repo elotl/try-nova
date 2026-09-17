@@ -75,7 +75,9 @@ spec:
     spec:
       containers:
         - name: follower
-          image: us-docker.pkg.dev/google-samples/containers/gke/gb-redis-follower:v2
+          image: "docker.io/redis:8.4.0"
+          command: ["redis-server"]
+          args: ["--replicaof", "redis-leader", "6379"]
           resources:
             requests:
               cpu: 100m
