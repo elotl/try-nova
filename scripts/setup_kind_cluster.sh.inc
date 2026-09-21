@@ -14,9 +14,14 @@ kubeconfig_workload_2="./kubeconfig-workload-2"
 # Determine the directory of the current script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
+# Number of extra worker nodes to add to each workload cluster (default 0: single-node clusters).
+# Set e.g. NOVA_KIND_WORKLOAD_WORKERS=3 to test multi-node placement (see systest/nova/mnnvl).
+NOVA_KIND_WORKLOAD_WORKERS="${NOVA_KIND_WORKLOAD_WORKERS:-0}"
+
 cluster_definition_yaml() {
     local image=$1
     local extra_port_mappings=$2
+    local num_workers=${3:-0}
 
     cat <<EOF
 kind: Cluster
@@ -42,6 +47,21 @@ EOF
     hostPort: 443
 EOF
 	fi
+
+	local i
+	for ((i = 0; i < num_workers; i++))
+	do
+		cat <<EOF
+- role: worker
+  image: ${image}
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        max-pods: "250"
+EOF
+	done
 }
 
 # Function to create a kind cluster
@@ -50,11 +70,12 @@ create_kind_cluster() {
     local kubeconfig_path=$2
     local image=$3
     local extra_port_mappings=$4
+    local num_workers=${5:-0}
 
     touch "$kubeconfig_path"
     export KUBECONFIG="$kubeconfig_path"
 
-    cluster_definition_yaml "$image" "$extra_port_mappings" |
+    cluster_definition_yaml "$image" "$extra_port_mappings" "$num_workers" |
         kind create cluster --name "$cluster_name" --config=-
 }
 
@@ -76,10 +97,10 @@ PID_METALLB_SPEAKER=$!
 create_kind_cluster "$cp_cluster" "$kubeconfig_cp" "$cp_node_image" true &
 PID_CP=$!
 
-create_kind_cluster "$workload_cluster_1" "$kubeconfig_workload_1" "$node_image" false &
+create_kind_cluster "$workload_cluster_1" "$kubeconfig_workload_1" "$node_image" false "$NOVA_KIND_WORKLOAD_WORKERS" &
 PID_W1=$!
 
-create_kind_cluster "$workload_cluster_2" "$kubeconfig_workload_2" "$node_image" false &
+create_kind_cluster "$workload_cluster_2" "$kubeconfig_workload_2" "$node_image" false "$NOVA_KIND_WORKLOAD_WORKERS" &
 PID_W2=$!
 
 # Wait for all cluster creations to finish
