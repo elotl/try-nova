@@ -18,14 +18,29 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 # Set e.g. NOVA_KIND_WORKLOAD_WORKERS=3 to test multi-node placement (see systest/nova/mnnvl).
 NOVA_KIND_WORKLOAD_WORKERS="${NOVA_KIND_WORKLOAD_WORKERS:-0}"
 
+# Optional file of extra top-level kind Cluster fields (e.g. featureGates, runtimeConfig) applied to all three
+# clusters (default: none).
+NOVA_KIND_EXTRA_CLUSTER_CONFIG="${NOVA_KIND_EXTRA_CLUSTER_CONFIG:-}"
+# Space-separated names of clusters that NOVA_KIND_EXTRA_CLUSTER_CONFIG is not applied to (default: none).
+NOVA_KIND_EXTRA_CONFIG_SKIP_CLUSTERS="${NOVA_KIND_EXTRA_CONFIG_SKIP_CLUSTERS:-}"
+
 cluster_definition_yaml() {
     local image=$1
     local extra_port_mappings=$2
     local num_workers=${3:-0}
+    local cluster_name=${4:-}
 
     cat <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+EOF
+
+	if [ -n "$NOVA_KIND_EXTRA_CLUSTER_CONFIG" ] && [[ " $NOVA_KIND_EXTRA_CONFIG_SKIP_CLUSTERS " != *" $cluster_name "* ]]
+	then
+		cat "$NOVA_KIND_EXTRA_CLUSTER_CONFIG"
+	fi
+
+	cat <<EOF
 nodes:
 - role: control-plane
   image: ${image}
@@ -75,7 +90,7 @@ create_kind_cluster() {
     touch "$kubeconfig_path"
     export KUBECONFIG="$kubeconfig_path"
 
-    cluster_definition_yaml "$image" "$extra_port_mappings" "$num_workers" |
+    cluster_definition_yaml "$image" "$extra_port_mappings" "$num_workers" "$cluster_name" |
         kind create cluster --name "$cluster_name" --config=-
 }
 
