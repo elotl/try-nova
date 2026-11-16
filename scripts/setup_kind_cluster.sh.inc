@@ -126,7 +126,7 @@ wait $PID_METALLB_CONTROLLER
 wait $PID_METALLB_SPEAKER
 
 for cluster in "$cp_cluster" "$workload_cluster_1" "$workload_cluster_2"; do
-    kind load docker-image --name "$cluster" "$metallb_controller_image" "$metallb_speaker_image" &
+    "${SCRIPT_DIR}/kind_load_image.sh" "$cluster" "$metallb_controller_image" "$metallb_speaker_image" &
 done
 wait
 

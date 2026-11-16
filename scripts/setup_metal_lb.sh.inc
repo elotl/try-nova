@@ -76,7 +76,14 @@ for i in $(seq 1 60); do
     fi
     sleep 2
 done
-KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait pod --all --timeout=300s --for=condition=Ready
+if ! KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait pod --all --timeout=300s --for=condition=Ready; then
+    echo "--- MetalLB pods not Ready (${kubeconfig_path}); diagnostics:" >&2
+    KUBECONFIG="${kubeconfig_path}" kubectl get pods -A -o wide >&2 || true
+    KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system describe pods >&2 || true
+    KUBECONFIG="${kubeconfig_path}" kubectl -n kube-system logs -l k8s-app=kube-proxy --tail=30 >&2 || true
+    echo "--- host inotify: max_user_instances=$(cat /proc/sys/fs/inotify/max_user_instances 2>/dev/null) max_user_watches=$(cat /proc/sys/fs/inotify/max_user_watches 2>/dev/null)" >&2
+    exit 1
+fi
 KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait deploy controller --timeout=300s --for=condition=Available
 KUBECONFIG="${kubeconfig_path}" kubectl -n metallb-system wait apiservice v1beta1.metallb.io --timeout=300s --for=condition=Available
 
