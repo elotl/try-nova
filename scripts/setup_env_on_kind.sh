@@ -182,9 +182,16 @@ create_workload_namespaces() {
 
 # Function to wait for and apply the nova-cluster-init-kubeconfig secret to workload clusters
 wait_and_apply_nova_cluster_init() {
+    local timeout="${NOVA_CLUSTER_INIT_TIMEOUT_SECONDS:-300}"
+    local waited=0
     while ! KUBECONFIG="${HOME}/.nova/nova/nova-kubeconfig" kubectl get secret nova-cluster-init-kubeconfig --namespace=${NOVA_NAMESPACE} &>/dev/null; do
+        if (( waited >= timeout )); then
+            echo "Timed out after ${timeout}s waiting for nova-cluster-init-kubeconfig secret creation" >&2
+            exit 1
+        fi
         echo "Waiting for nova-cluster-init-kubeconfig secret creation"
         sleep 5
+        waited=$((waited + 5))
     done
 
     for kubeconfig in "${kubeconfig_workload_1}" "${kubeconfig_workload_2}"; do
