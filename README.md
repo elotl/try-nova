@@ -7,14 +7,13 @@
 [Elotl-Image]: https://img.shields.io/badge/Elotl-home-blue
 [Elotl-Url]: https://www.elotl.co/
 [Slack-Image]: https://img.shields.io/badge/chat-on%20slack-green
-[Slack-Url]: https://join.slack.com/t/elotl-free-trial/shared_invite/zt-1tciz8cck-H9Swzl2grCqPaLJeHYtbBQ
+[Slack-Url]: https://join.slack.com/t/elotl-nova/shared_invite/zt-2vdckvb41-mgSvqFU_r4nETdU9R1DQhw
 
 This README includes:
 1. An installation guide for Nova on KIND clusters.
-The scripts in this repo will allow you to create a sandbox environment for using Nova's trial version (for managing up to 6 workload clusters). If you are interested in using the full version, please contact us at info@elotl.co
 2. Tutorials that walk you through the core functionalities of Nova.
 
-We love feedback, so please feel free to ask questions by creating an issue in this repo, joining our Slack: [Elotl Free Trial](https://join.slack.com/t/elotl-free-trial/shared_invite/zt-1tciz8cck-H9Swzl2grCqPaLJeHYtbBQ) or writing to us at info@elotl.co
+We love feedback, so please feel free to ask questions by creating an issue in this repo, joining our Slack: [Elotl Nova](https://join.slack.com/t/elotl-nova/shared_invite/zt-2vdckvb41-mgSvqFU_r4nETdU9R1DQhw) or writing to us at info@elotl.co
 
 ## Prerequisites
 
@@ -83,7 +82,7 @@ Verify `novactl` is installed.
   kubectl nova --version
 ```
 
-Navigate to the root of this repository and setup enviornment variables for trial environment.
+Navigate to the root of this repository and setup enviornment variables for the sandbox environment.
 ```sh
 export NOVA_NAMESPACE=elotl
 export NOVA_CONTROLPLANE_CONTEXT=nova
@@ -95,9 +94,9 @@ export NOVA_WORKLOAD_CLUSTER_2=wlc-2
 export K8S_HOSTING_CLUSTER=hosting-cluster
 ```
 
-Create trial environment with 3 Kind clusters. First Kind cluster will host Nova. Second Kind cluster will host workload cluster `wlc-1`. Third Kind cluster will host workload cluster `wlc-2`. Nova will manage `wlc-1` and `wlc-2` as a fleet.
+Create sandbox environment with 3 Kind clusters. First Kind cluster will host Nova. Second Kind cluster will host workload cluster `wlc-1`. Third Kind cluster will host workload cluster `wlc-2`. Nova will manage `wlc-1` and `wlc-2` as a fleet.
 ```sh
-./scripts/setup_trial_env_on_kind.sh
+./scripts/setup_env_on_kind.sh
 ```
 
 Update KUBECONFIG to include Nova and workload clusters.
@@ -191,7 +190,7 @@ Want to explore other fun Nova Schedule Policies? Check them out here!
 * [Spread Scheduling](https://docs.elotl.co/nova/Tutorials/poc-spread-onto-multiple-clusters)
 * [Just In Time Clusters](https://docs.elotl.co/nova/Tutorials/poc-standby-workload-cluster)
 
-After you are done with the trial, delete Kind environment.
+After you are done, delete Kind environment.
 ```sh
 ./scripts/teardown_kind_cluster.sh
 ./scripts/cleanup_files.sh
@@ -209,7 +208,7 @@ Verify `novactl` is installed.
   kubectl nova --version
 ```
 
-Navigate to the root of this repository and setup enviornment variables for trial environment.
+Navigate to the root of this repository and setup enviornment variables for the sandbox environment.
 ```sh
 export NOVA_NAMESPACE=elotl
 export NOVA_CONTROLPLANE_CONTEXT=nova
@@ -223,7 +222,7 @@ export VCLUSTER_1=vcluster-1
 export VCLUSTER_2=vcluster-2
 ```
 
-Create trial environment with 3 Kind clusters. First Kind cluster will host Nova. Second Kind cluster will host `vCluster-1`. Third Kind cluster will host `vCluster-2`. Nova will manage `vCluster-1` and `vCluster-2` as a fleet.
+Create sandbox environment with 3 Kind clusters. First Kind cluster will host Nova. Second Kind cluster will host `vCluster-1`. Third Kind cluster will host `vCluster-2`. Nova will manage `vCluster-1` and `vCluster-2` as a fleet.
 ```sh
     ./scripts/setup_vcluster.sh
 ```
@@ -320,11 +319,11 @@ Want to explore other fun Nova Schedule Policies? Check them out here!
 * [Spread Scheduling](https://docs.elotl.co/nova/Tutorials/poc-spread-onto-multiple-clusters)
 * [Just In Time Clusters](https://docs.elotl.co/nova/Tutorials/poc-standby-workload-cluster)
 
-After you are done with the trial, delete vCluster environment.
+After you are done, delete vCluster environment.
 ```sh
 ./scripts/teardown_vcluster.sh
 ```
 
 # Beyond KIND / vCluster
 
-If you'd like to try Nova on hyperscalers (AWS, GCP, Azure, OCI, etc), neoclouds (CoreWeave, Lambda, etc), or on-prem, please grab free trial bits at https://www.elotl.co/nova-free-trial.html
+If you'd like to try Nova on hyperscalers (AWS, GCP, Azure, OCI, etc), neoclouds (CoreWeave, Lambda, etc), or on-prem, please see the installation docs in `docs/installation_novactl.md`.

@@ -41,8 +41,8 @@ kubeconfig_vcluster_1="${REPO_ROOT}/kubeconfig-vcluster-1"
 kubeconfig_vcluster_2="${REPO_ROOT}/kubeconfig-vcluster-2"
 
 # Set image repositories with defaults or use the provided values
-SCHEDULER_IMAGE_REPO=${SCHEDULER_IMAGE_REPO:-"elotl/nova-scheduler-trial"}
-AGENT_IMAGE_REPO=${AGENT_IMAGE_REPO:-"elotl/nova-agent-trial"}
+SCHEDULER_IMAGE_REPO=${SCHEDULER_IMAGE_REPO:-"elotl/nova-scheduler"}
+AGENT_IMAGE_REPO=${AGENT_IMAGE_REPO:-"elotl/nova-agent"}
 
 # Used for backwards compatibility with e2e test pipeline
 AGENT_NAME_PREFIX="${AGENT_NAME_PREFIX:-}"
